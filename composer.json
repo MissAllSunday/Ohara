@@ -1,9 +1,8 @@
 {
-	"name": "suki/Ohara",
+	"name": "Suki/Ohara",
 	"description": "Helper class for SMF",
 	"homepage": "https://github.com/MissAllSunday/Ohara",
 	"license": "MPL-1.1",
-	"version" : "1.0.0",
 	"authors": [
 		{
 			"name": "Matt Zuba",
