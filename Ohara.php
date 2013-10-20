@@ -119,7 +119,8 @@ class Ohara
 		if (empty($string))
 			return false;
 
-		loadLanguage(static::$className);
+		if (!isset($txt[static::$className .'_'. $string]))
+			loadLanguage(static::$className);
 
 		if (!empty($txt[static::$className .'_'. $string]))
 			return $txt[static::$className .'_'. $string];
