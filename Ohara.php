@@ -142,6 +142,7 @@ class Ohara
 
 	public function sanitize($var)
 	{
+		global $smcFunc;
 
 		if (empty($var))
 			return false;
@@ -158,11 +159,11 @@ class Ohara
 				if (empty($_REQUEST[$item]))
 					$return[$item] = '';
 
-				if (is_numeric($_REQUEST[$item]))
+				if (ctype_digit($_REQUEST[$item]))
 					$return[$item] = (int) trim($_REQUEST[$item]);
 
 				elseif (is_string($_REQUEST[$item]))
-					$return[$item] = trim(htmlspecialchars($_REQUEST[$item], ENT_QUOTES));
+					$return[$item] = $smcFunc['htmlspecialchars'](trim($_REQUEST[$item]), ENT_QUOTES);
 			}
 
 		// No? a single item then, check it boy, check it!
@@ -171,11 +172,11 @@ class Ohara
 
 		else
 		{
-			if (is_numeric($_REQUEST[$var]))
+			if (ctype_digit($_REQUEST[$var]))
 				$return = (int) trim($_REQUEST[$var]);
 
 			elseif (is_string($_REQUEST[$var]))
-				$return = trim(htmlspecialchars($_REQUEST[$var], ENT_QUOTES));
+				$return = $smcFunc['htmlspecialchars'](trim($_REQUEST[$var]), ENT_QUOTES));
 		}
 
 		return $return;
@@ -183,9 +184,6 @@ class Ohara
 
 	public function data($var = false)
 	{
-		if (empty($var))
-			return false;
-
 		return $this->sanitize($var);
 	}
 }
