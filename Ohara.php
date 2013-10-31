@@ -140,4 +140,52 @@ class Ohara
 			return false;
 	}
 
+	public function sanitize($var)
+	{
+
+		if (empty($var))
+			return false;
+
+		$return = false;
+
+		// Is this an array?
+		if (is_array($var))
+			foreach ($var as $item)
+			{
+				if (!in_array($item, $_REQUEST))
+					continue;
+
+				if (empty($_REQUEST[$item]))
+					$return[$item] = '';
+
+				if (is_numeric($_REQUEST[$item]))
+					$return[$item] = (int) trim($_REQUEST[$item]);
+
+				elseif (is_string($_REQUEST[$item]))
+					$return[$item] = trim(htmlspecialchars($_REQUEST[$item], ENT_QUOTES));
+			}
+
+		// No? a single item then, check it boy, check it!
+		elseif (empty($_REQUEST[$var]))
+			return false;
+
+		else
+		{
+			if (is_numeric($_REQUEST[$var]))
+				$return = (int) trim($_REQUEST[$var]);
+
+			elseif (is_string($_REQUEST[$var]))
+				$return = trim(htmlspecialchars($_REQUEST[$var], ENT_QUOTES));
+		}
+
+		return $return;
+	}
+
+	public function data($var = false)
+	{
+		if (empty($var))
+			return false;
+
+		return $this->sanitize($var);
+	}
 }
