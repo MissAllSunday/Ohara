@@ -130,6 +130,16 @@ class Ohara
 						else
 						return false;
 					},
+				'setting' => function($var)
+					{
+						global $modSettings;
+
+						if (!empty($modSettings[static::$name .'_'. $var]))
+							return $modSettings[static::$name .'_'. $var];
+
+						else
+							return false;
+					}
 			);
 
 			// Is there any helper class?
@@ -153,17 +163,6 @@ class Ohara
 		}
 
 		return self::$instance;
-	}
-
-	public function setting($var)
-	{
-		global $modSettings;
-
-		if (!empty($modSettings[static::$name .'_'. $var]))
-			return $modSettings[static::$name .'_'. $var];
-
-		else
-			return false;
 	}
 
 	public function sanitize($var)
