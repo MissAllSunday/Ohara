@@ -112,43 +112,44 @@ class Ohara
 		{
 			self::$instance = new static::$name();
 
+			$class = static::$name;
+
 			// Feeling almighty? how about creating some tools?
-			self::$instance->tools = array(
-				'text' => function($string)
-					{
-						global $txt;
+				self::$instance->text = function($string) use($class)
+				{
+					global $txt;
 
-						if (empty($string))
-							return false;
-
-						if (!isset($txt[static::$name .'_'. $string]))
-							loadLanguage(static::$name);
-
-						if (!empty($txt[static::$name .'_'. $string]))
-							return $txt[static::$name .'_'. $string];
-
-						else
+					if (empty($string))
 						return false;
-					},
-				'setting' => function($var)
-					{
-						global $modSettings;
 
-						if (!empty($modSettings[static::$name .'_'. $var]))
-							return $modSettings[static::$name .'_'. $var];
+					if (!isset($txt[$class .'_'. $string]))
+						loadLanguage($class);
 
-						else
-							return false;
-					},
-				'data' => function($var = false) use (static::$name)
-					{
-						$class = static::$name;
-						return $class::sanitize($var);
-					},
-			);
+					if (!empty($txt[$class .'_'. $string]))
+						return $txt[$class .'_'. $string];
+
+					else
+					return false;
+				};
+
+				self::$instance->setting = function($var) use($class)
+				{
+					global $modSettings;
+
+					if (!empty($modSettings[$class .'_'. $var]))
+						return $modSettings[$class .'_'. $var];
+
+					else
+						return false;
+				};
+
+				self::$instance->data = function($var = false) use ($class)
+				{
+					return $class::sanitize($var);
+				};
 
 			// Is there any helper class?
-			if isset(static::$helpers)
+			if (!empty(static::$helpers))
 			{
 				// Load the file and instantiate the class
 				foreach (static::$helpers as $helper)
@@ -164,7 +165,7 @@ class Ohara
 					$toolName = static::$name . ucfirst($helper);
 
 					// Do the locomotion!
-					self::$instance->$tool = new $toolName(self::$instance->tools);
+					self::$instance->$tool = new $toolName(self::$instance->text, self::$instance->setting, self::$instance->data);
 				}
 			}
 		}
@@ -208,9 +209,19 @@ class Ohara
 				$return = (int) trim($_REQUEST[$var]);
 
 			elseif (is_string($_REQUEST[$var]))
-				$return = $smcFunc['htmlspecialchars'](trim($_REQUEST[$var]), ENT_QUOTES));
+				$return = $smcFunc['htmlspecialchars'](trim($_REQUEST[$var]), ENT_QUOTES);
 		}
 
 		return $return;
+	}
+
+	// Gotta use some magic tricks since PHP 5.4 is still far in the horizon :(
+	public function __call($method, $args)
+	{
+		if(is_callable(array($this, $method)))
+			return call_user_func_array($this->$method, $args);
+
+		else
+			trigger_error('The closure you\'re trying to call does not exist or hasn\'t been properly set', E_USER_ERROR);
 	}
 }
