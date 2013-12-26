@@ -103,11 +103,34 @@ class Ohara
 	 */
 	public static function run()
 	{
+		global $sourcedir;
+
 		if (!isset(static::$name))
 			trigger_error('<strong>protected static $name = __CLASS__;</strong> must be contained in child class', E_USER_ERROR);
 
 		if (!isset(self::$instance) || !(self::$instance instanceof static::$name))
+		{
 			self::$instance = new static::$name();
+
+			// Is there any helper class?
+			if isset(static::$helpers)
+			{
+				// Load the file and instantiate the class
+				foreach (static::$helpers as $helper)
+				{
+					// Custom folder? relative to the Sourcedir one.
+					if (isset(static::$folder))
+						require_once($sourcedir . '/'. static::$folder .'/'. ucfirst($helper) .'.php');
+
+					else
+						require_once($sourcedir . '/'. ucfirst($helper) .'.php');
+
+					// Prepare the name
+					$toolName = static::$name . $helper;
+					self::$instance->$tool = new $toolName();
+				}
+			}
+		}
 
 		return self::$instance;
 	}
