@@ -162,7 +162,9 @@ class Ohara
 
 					// Prepare the name
 					$toolName = static::$name . $helper;
-					self::$instance->$tool = new $toolName();
+
+					// Do the locomotion!
+					self::$instance->$tool = new $toolName(self::$instance->tools);
 				}
 			}
 		}
