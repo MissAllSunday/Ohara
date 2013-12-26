@@ -115,38 +115,38 @@ class Ohara
 			$class = static::$name;
 
 			// Feeling almighty? how about creating some tools?
-				self::$instance->text = function($string) use($class)
-				{
-					global $txt;
+			self::$instance->text = function($string) use($class)
+			{
+				global $txt;
 
-					if (empty($string))
-						return false;
-
-					if (!isset($txt[$class .'_'. $string]))
-						loadLanguage($class);
-
-					if (!empty($txt[$class .'_'. $string]))
-						return $txt[$class .'_'. $string];
-
-					else
+				if (empty($string))
 					return false;
-				};
 
-				self::$instance->setting = function($var) use($class)
-				{
-					global $modSettings;
+				if (!isset($txt[$class .'_'. $string]))
+					loadLanguage($class);
 
-					if (!empty($modSettings[$class .'_'. $var]))
-						return $modSettings[$class .'_'. $var];
+				if (!empty($txt[$class .'_'. $string]))
+					return $txt[$class .'_'. $string];
 
-					else
-						return false;
-				};
+				else
+				return false;
+			};
 
-				self::$instance->data = function($var = false) use ($class)
-				{
-					return $class::sanitize($var);
-				};
+			self::$instance->setting = function($var) use($class)
+			{
+				global $modSettings;
+
+				if (!empty($modSettings[$class .'_'. $var]))
+					return $modSettings[$class .'_'. $var];
+
+				else
+					return false;
+			};
+
+			self::$instance->data = function($var = false) use ($class)
+			{
+				return $class::sanitize($var);
+			};
 
 			// Is there any helper class?
 			if (!empty(static::$helpers))
