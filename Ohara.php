@@ -139,7 +139,12 @@ class Ohara
 
 						else
 							return false;
-					}
+					},
+				'data' => function($var = false) use (static::$name)
+					{
+						$class = static::$name;
+						return $class::sanitize($var);
+					},
 			);
 
 			// Is there any helper class?
@@ -205,10 +210,5 @@ class Ohara
 		}
 
 		return $return;
-	}
-
-	public function data($var = false)
-	{
-		return $this->sanitize($var);
 	}
 }
