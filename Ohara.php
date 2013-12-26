@@ -112,6 +112,26 @@ class Ohara
 		{
 			self::$instance = new static::$name();
 
+			// Feeling almighty? how about creating some tools?
+			self::$instance->tools = array(
+				'text' => function($string)
+					{
+						global $txt;
+
+						if (empty($string))
+							return false;
+
+						if (!isset($txt[static::$name .'_'. $string]))
+							loadLanguage(static::$name);
+
+						if (!empty($txt[static::$name .'_'. $string]))
+							return $txt[static::$name .'_'. $string];
+
+						else
+						return false;
+					},
+			);
+
 			// Is there any helper class?
 			if isset(static::$helpers)
 			{
@@ -133,23 +153,6 @@ class Ohara
 		}
 
 		return self::$instance;
-	}
-
-	public function text($string)
-	{
-		global $txt;
-
-		if (empty($string))
-			return false;
-
-		if (!isset($txt[static::$name .'_'. $string]))
-			loadLanguage(static::$name);
-
-		if (!empty($txt[static::$name .'_'. $string]))
-			return $txt[static::$name .'_'. $string];
-
-		else
-		return false;
 	}
 
 	public function setting($var)
