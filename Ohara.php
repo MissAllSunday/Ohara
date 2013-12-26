@@ -64,7 +64,7 @@ class Ohara
 	public function installHooks()
 	{
 		foreach ($this->hooks as $hook => $method)
-			add_integration_function($hook, static::$className . '::handleHook', $this->persistHooks);
+			add_integration_function($hook, static::$name . '::handleHook', $this->persistHooks);
 	}
 
 	public function getHooks()
@@ -103,11 +103,11 @@ class Ohara
 	 */
 	public static function run()
 	{
-		if (!isset(static::$className))
-			trigger_error('<strong>protected static $className = __CLASS__;</strong> must be contained in child class', E_USER_ERROR);
+		if (!isset(static::$name))
+			trigger_error('<strong>protected static $name = __CLASS__;</strong> must be contained in child class', E_USER_ERROR);
 
-		if (!isset(self::$instance) || !(self::$instance instanceof static::$className))
-			self::$instance = new static::$className();
+		if (!isset(self::$instance) || !(self::$instance instanceof static::$name))
+			self::$instance = new static::$name();
 
 		return self::$instance;
 	}
@@ -119,11 +119,11 @@ class Ohara
 		if (empty($string))
 			return false;
 
-		if (!isset($txt[static::$className .'_'. $string]))
-			loadLanguage(static::$className);
+		if (!isset($txt[static::$name .'_'. $string]))
+			loadLanguage(static::$name);
 
-		if (!empty($txt[static::$className .'_'. $string]))
-			return $txt[static::$className .'_'. $string];
+		if (!empty($txt[static::$name .'_'. $string]))
+			return $txt[static::$name .'_'. $string];
 
 		else
 		return false;
@@ -133,8 +133,8 @@ class Ohara
 	{
 		global $modSettings;
 
-		if (!empty($modSettings[static::$className .'_'. $var]))
-			return $modSettings[static::$className .'_'. $var];
+		if (!empty($modSettings[static::$name .'_'. $var]))
+			return $modSettings[static::$name .'_'. $var];
 
 		else
 			return false;
