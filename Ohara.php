@@ -161,7 +161,7 @@ class Ohara
 						require_once($sourcedir . '/'. ucfirst($helper) .'.php');
 
 					// Prepare the name
-					$toolName = static::$name . $helper;
+					$toolName = static::$name . ucfirst($helper);
 
 					// Do the locomotion!
 					self::$instance->$tool = new $toolName(self::$instance->tools);
