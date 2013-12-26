@@ -154,15 +154,15 @@ class Ohara
 				// Load the file and instantiate the class
 				foreach (static::$helpers as $helper)
 				{
+					// Prepare the name
+					$toolName = $class . ucfirst($helper);
+
 					// Custom folder? relative to the Sourcedir one.
 					if (isset(static::$folder))
-						require_once($sourcedir . '/'. static::$folder .'/'. ucfirst($helper) .'.php');
+						require_once($sourcedir . '/'. static::$folder .'/'. $toolName .'.php');
 
 					else
-						require_once($sourcedir . '/'. ucfirst($helper) .'.php');
-
-					// Prepare the name
-					$toolName = static::$name . ucfirst($helper);
+						require_once($sourcedir . '/'. $toolName .'.php');
 
 					// Do the locomotion!
 					self::$instance->$tool = new $toolName(self::$instance->text, self::$instance->setting, self::$instance->data);
