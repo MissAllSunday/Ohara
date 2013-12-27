@@ -37,7 +37,7 @@ class Ohara
 	/**
 	 * @var SMF_Singleton Instance of the bridge class
 	 */
-	protected static $instance;
+	public static $mods = array();
 
 	/**
 	 * @var array Comma separated list of hooks this class implements
@@ -69,7 +69,7 @@ class Ohara
 
 	public function getHooks()
 	{
-		return isset(self::$instance->hooks) ? self::$instance->hooks : false;
+		return isset(self::$mods[static::$name]->hooks) ? self::$mods[static::$name]->hooks : false;
 	}
 
 	/**
@@ -78,7 +78,7 @@ class Ohara
 	 */
 	public static function handleHook()
 	{
-		$hooks = self::$instance->getHooks();
+		$hooks = self::$mods[static::$name]->getHooks();
 		$backtrace = debug_backtrace();
 		$method = NULL;
 		$args = NULL;
@@ -90,10 +90,10 @@ class Ohara
 				break;
 			}
 
-		if (!isset($method) || !is_callable(array(self::$instance, $method)))
+		if (!isset($method) || !is_callable(array(self::$mods[static::$name], $method)))
 			trigger_error('Invalid call to handleHook', E_USER_ERROR);
 
-		return call_user_func_array(array(self::$instance, $method), $args);
+		return call_user_func_array(array(self::$mods[static::$name], $method), $args);
 	}
 
 	/**
@@ -108,14 +108,14 @@ class Ohara
 		if (!isset(static::$name))
 			trigger_error('<strong>protected static $name = __CLASS__;</strong> must be contained in child class', E_USER_ERROR);
 
-		if (!isset(self::$instance) || !(self::$instance instanceof static::$name))
+		if (!isset(self::$mods[static::$name]) || !(self::$mods[static::$name] instanceof static::$name))
 		{
-			self::$instance = new static::$name();
+			self::$mods[static::$name] = new static::$name();
 
 			$class = static::$name;
 
 			// Feeling almighty? how about creating some tools?
-			self::$instance->text = function($string) use($class)
+			self::$mods[static::$name]->text = function($string) use($class)
 			{
 				global $txt;
 
@@ -132,7 +132,7 @@ class Ohara
 				return false;
 			};
 
-			self::$instance->setting = function($var) use($class)
+			self::$mods[static::$name]->setting = function($var) use($class)
 			{
 				global $modSettings;
 
@@ -143,7 +143,7 @@ class Ohara
 					return false;
 			};
 
-			self::$instance->data = function($var = false) use ($class)
+			self::$mods[static::$name]->data = function($var = false) use ($class)
 			{
 				return $class::sanitize($var);
 			};
@@ -165,12 +165,12 @@ class Ohara
 						require_once($sourcedir . '/'. $toolName .'.php');
 
 					// Do the locomotion!
-					self::$instance->$tool = new $toolName(self::$instance->text, self::$instance->setting, self::$instance->data);
+					self::$mods[static::$name]->$tool = new $toolName(self::$mods[static::$name]->text, self::$mods[static::$name]->setting, self::$mods[static::$name]->data);
 				}
 			}
 		}
 
-		return self::$instance;
+		return self::$mods[static::$name];
 	}
 
 	public function sanitize($var)
@@ -219,7 +219,7 @@ class Ohara
 	public function __call($method, $args)
 	{
 		if(is_callable(array($this, $method)))
-			return call_user_func_array($this->$method, $args);
+			return $this->$method($args);
 
 		else
 			trigger_error('The closure you\'re trying to call does not exist or hasn\'t been properly set', E_USER_ERROR);
