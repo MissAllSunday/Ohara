@@ -8,169 +8,65 @@
  * @license http://www.mozilla.org/MPL/MPL-1.1.html
  */
 
-/*
- * Version: MPL 1.1
- *
- * The contents of this file are subject to the Mozilla Public License Version
- * 1.1 (the "License"); you may not use this file except in compliance with
- * the License. You may obtain a copy of the License at
- * http://www.mozilla.org/MPL/
- *
- * Software distributed under the License is distributed on an "AS IS" basis,
- * WITHOUT WARRANTY OF ANY KIND, either express or implied. See the License
- * for the specific language governing rights and limitations under the
- * License.
- *
- * The Original Code is http://code.mattzuba.com code.
- *
- * The Initial Developer of the Original Code is
- * Matt Zuba.
- * Portions created by the Initial Developer are Copyright (C) 2010-2011
- * the Initial Developer. All Rights Reserved.
- *
- * Contributor(s):
- * Jessica González <suki@missallsunday.com>
- */
-
 class Ohara
 {
-	/**
-	 * @var SMF_Singleton Instance of the bridge class
-	 */
-	public static $mods = array();
+	public static $name = '';
 
-	/**
-	 * @var array Comma separated list of hooks this class implements
-	 */
-	protected $hooks = array();
-
-	/**
-	 * @var boolean Should the hooks only be installed once?
-	 */
-	protected $persistHooks = FALSE;
-
-	/**
-	 * This should be overwritten
-	 */
-	protected function __construct()
+	public function text($var)
 	{
-		if (!$this->persistHooks)
-			$this->installHooks();
+		global $txt;
+
+		// This should be extended by somebody else...
+		if (!empty(static::$name))
+			return false;
+
+		// No var to check.
+		if (empty($var))
+			return false;
+
+		// Load the mod's language file.
+		loadLanguage(static::$name);
+
+		if (!empty($txt[static::$name .'_'. $var]))
+			return $txt[static::$name .'_'. $var];
+
+		else
+			return false;
 	}
 
-	/**
-	 * Installs the hooks to be used by this module.
-	 */
-	public function installHooks()
+	public function enable($var)
 	{
-		foreach ($this->hooks as $hook => $method)
-			add_integration_function($hook, static::$name . '::handleHook', $this->persistHooks);
+		global $modSettings;
+
+		if (empty($var))
+			return false;
+
+		if (isset($modSettings[static::$name .'_'. $var]) && !empty($modSettings[static::$name .'_'. $var]))
+			return true;
+
+		else
+			return false;
 	}
 
-	public function getHooks()
+	public function setting($var)
 	{
-		return isset(self::$mods[static::$name]->hooks) ? self::$mods[static::$name]->hooks : false;
+		global $modSettings;
+
+		if (empty($var))
+			return false;
+
+		global $modSettings;
+
+		if (true == $this->enable($var))
+			return $modSettings[static::$name .'_'. $var];
+
+		else
+			return false;
 	}
 
-	/**
-	 * Takes all call_integration_hook calls from SMF and figures out what
-	 * method to call within the class
-	 */
-	public static function handleHook()
+	public function data($var)
 	{
-		$hooks = self::$mods[static::$name]->getHooks();
-		$backtrace = debug_backtrace();
-		$method = NULL;
-		$args = NULL;
-		foreach ($backtrace as $item)
-			if ($item['function'] === 'call_integration_hook')
-			{
-				$method = $hooks[$item['args'][0]];
-				$args = !empty($item['args'][1]) ? $item['args'][1] : array();
-				break;
-			}
-
-		if (!isset($method) || !is_callable(array(self::$mods[static::$name], $method)))
-			trigger_error('Invalid call to handleHook', E_USER_ERROR);
-
-		return call_user_func_array(array(self::$mods[static::$name], $method), $args);
-	}
-
-	/**
-	 * Let's try the singleton method
-	 *
-	 * @return object
-	 */
-	public static function run()
-	{
-		global $sourcedir;
-
-		if (!isset(static::$name))
-			trigger_error('<strong>protected static $name = __CLASS__;</strong> must be contained in child class', E_USER_ERROR);
-
-		if (!isset(self::$mods[static::$name]) || !(self::$mods[static::$name] instanceof static::$name))
-		{
-			self::$mods[static::$name] = new static::$name();
-
-			$class = static::$name;
-
-			// Feeling almighty? how about creating some tools?
-			self::$mods[static::$name]->text = function($string) use($class)
-			{
-				global $txt;
-
-				if (empty($string))
-					return false;
-
-				if (!isset($txt[$class .'_'. $string]))
-					loadLanguage($class);
-
-				if (!empty($txt[$class .'_'. $string]))
-					return $txt[$class .'_'. $string];
-
-				else
-				return false;
-			};
-
-			self::$mods[static::$name]->setting = function($var) use($class)
-			{
-				global $modSettings;
-
-				if (!empty($modSettings[$class .'_'. $var]))
-					return $modSettings[$class .'_'. $var];
-
-				else
-					return false;
-			};
-
-			self::$mods[static::$name]->data = function($var = false) use ($class)
-			{
-				return $class::sanitize($var);
-			};
-
-			// Is there any helper class?
-			if (!empty(static::$helpers))
-			{
-				// Load the file and instantiate the class
-				foreach (static::$helpers as $helper)
-				{
-					// Prepare the name
-					$toolName = $class . ucfirst($helper);
-
-					// Custom folder? relative to the Sourcedir one.
-					if (isset(static::$folder))
-						require_once($sourcedir . '/'. static::$folder .'/'. $toolName .'.php');
-
-					else
-						require_once($sourcedir . '/'. $toolName .'.php');
-
-					// Do the locomotion!
-					self::$mods[static::$name]->$tool = new $toolName(self::$mods[static::$name]->text, self::$mods[static::$name]->setting, self::$mods[static::$name]->data);
-				}
-			}
-		}
-
-		return self::$mods[static::$name];
+		return $this->sanitize($var);
 	}
 
 	public function sanitize($var)
@@ -213,15 +109,5 @@ class Ohara
 		}
 
 		return $return;
-	}
-
-	// Gotta use some magic tricks since PHP 5.4 is still far in the horizon :(
-	public function __call($method, $args)
-	{
-		if(is_callable(array($this, $method)))
-			return $this->$method($args);
-
-		else
-			trigger_error('The closure you\'re trying to call does not exist or hasn\'t been properly set', E_USER_ERROR);
 	}
 }
