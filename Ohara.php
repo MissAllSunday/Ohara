@@ -1,11 +1,11 @@
 <?php
 
 /**
- * @package Ohara helper class mod
+ * @package Ohara helper class
  * @version 1.0
  * @author Jessica González <suki@missallsunday.com>
- * @copyright Copyright (c) 2013, Jessica González
- * @license http://www.mozilla.org/MPL/MPL-1.1.html
+ * @copyright Copyright (c) 2014, Jessica González
+ * @license http://www.mozilla.org/MPL/2.0/
  */
 
 class Ohara
