@@ -17,7 +17,7 @@ class Ohara
 		global $txt;
 
 		// This should be extended by somebody else...
-		if (!empty(static::$name))
+		if (empty(static::$name))
 			return false;
 
 		// No var to check.
@@ -51,6 +51,10 @@ class Ohara
 	public function setting($var)
 	{
 		global $modSettings;
+
+		// This should be extended by somebody else...
+		if (empty(static::$name))
+			return false;
 
 		if (empty($var))
 			return false;
