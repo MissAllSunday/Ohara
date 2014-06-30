@@ -1,19 +1,19 @@
 {
-    "name": "Suki/Ohara",
-    "type": "library",
-    "description": "Helper class for SMF mods",
-    "keywords": ["SMF","modifications"],
-    "homepage": "http://github.com/MissAllSunday/Ohara",
-    "license": "MPL",
-    "authors": [
-        {
-            "name": "Jessica González",
-            "email": "suki@missallsunday.com",
-            "homepage": "http://missallsunday.com",
-            "role": "Developer"
-        }
-    ],
-    "require": {
-        "php": ">=5.3.0"
-    },
+	"name": "suki/ohara",
+	"type": "library",
+	"description": "Helper class for SMF mods",
+	"keywords": ["SMF","modifications"],
+	"homepage": "http://github.com/MissAllSunday/Ohara",
+	"license": "MPL-2.0",
+	"authors": [
+		{
+			"name": "Jessica González",
+			"email": "suki@missallsunday.com",
+			"homepage": "http://missallsunday.com",
+			"role": "Developer"
+		}
+	],
+	"require": {
+		"php": ">=5.3.0"
+	}
 }
