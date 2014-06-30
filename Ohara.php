@@ -73,45 +73,31 @@ class Ohara
 		return $this->sanitize($var);
 	}
 
+	public function validate($var)
+	{
+		return (isset($this->_request[$var]));
+	}
+
 	public function sanitize($var)
 	{
 		global $smcFunc;
 
-		if (empty($var))
-			return false;
-
-		$return = false;
-
-		// Is this an array?
 		if (is_array($var))
-			foreach ($var as $item)
-			{
-				if (!in_array($item, $_REQUEST))
-					continue;
-
-				if (empty($_REQUEST[$item]))
-					$return[$item] = '';
-
-				if (ctype_digit($_REQUEST[$item]))
-					$return[$item] = (int) trim($_REQUEST[$item]);
-
-				elseif (is_string($_REQUEST[$item]))
-					$return[$item] = $smcFunc['htmlspecialchars'](trim($_REQUEST[$item]), ENT_QUOTES);
-			}
-
-		// No? a single item then, check it boy, check it!
-		elseif (empty($_REQUEST[$var]))
-			return false;
+			foreach ($var as $k => $v)
+				$var[$k] = $this->sanitize($v);
 
 		else
 		{
-			if (ctype_digit($_REQUEST[$var]))
-				$return = (int) trim($_REQUEST[$var]);
+			if (is_numeric($var))
+				$var = (int)trim($var);
 
-			elseif (is_string($_REQUEST[$var]))
-				$return = $smcFunc['htmlspecialchars'](trim($_REQUEST[$var]), ENT_QUOTES);
+			else if (is_string($var))
+				$var =  $smcFunc['htmltrim']($smcFunc['htmlspecialchars']($var), ENT_QUOTES);
+
+			else
+				$var = 'error_' . $var;
 		}
 
-		return $return;
+		return $var;
 	}
 }
