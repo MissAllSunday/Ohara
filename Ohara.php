@@ -70,11 +70,15 @@ class Ohara
 
 	public function data($var)
 	{
-		return $this->sanitize($var);
+		return $this->validate($var) ? $this->sanitize($this->_request[$var]) : false;
 	}
 
-	public function validate($var)
+	public function validate($var, $type = 'request')
 	{
+		$this->_types = array('request' => $_REQUEST, 'get' => $_GET, 'post' => $_POST);
+
+		$this->_request = (empty($type) || !isset($types[$type])) ? $_REQUEST : $types[$type];
+
 		return (isset($this->_request[$var]));
 	}
 
@@ -92,7 +96,7 @@ class Ohara
 				$var = (int)trim($var);
 
 			else if (is_string($var))
-				$var =  $smcFunc['htmltrim']($smcFunc['htmlspecialchars']($var), ENT_QUOTES);
+				$var = $smcFunc['htmltrim']($smcFunc['htmlspecialchars']($var), ENT_QUOTES);
 
 			else
 				$var = 'error_' . $var;
