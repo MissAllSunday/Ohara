@@ -38,3 +38,13 @@ Thumbs.db
 /nbproject/private/
 /nbproject/
 /.project
+
+# Test / Private files #
+########################
+/nbproject/private/
+/nbproject/
+.directory
+.idea/
+/test.php
+/vendor/
+/.git/
