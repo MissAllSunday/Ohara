@@ -8,6 +8,8 @@
  * @license http://www.mozilla.org/MPL/2.0/
  */
 
+namespace Suki;
+
 class Ohara
 {
 	public static $name = '';
