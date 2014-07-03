@@ -89,8 +89,12 @@ class Ohara
 		global $smcFunc;
 
 		if (is_array($var))
+		{
 			foreach ($var as $k => $v)
 				$var[$k] = $this->sanitize($v);
+
+			return $var;
+		}
 
 		else
 		{
