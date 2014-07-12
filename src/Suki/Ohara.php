@@ -13,16 +13,13 @@ namespace Suki;
 class Ohara
 {
 	public static $name = '';
+	protected static $text = array();
 
-	public function text($var)
+	protected function setText($var)
 	{
 		global $txt;
 
-		// This should be extended by somebody else...
-		if (empty(static::$name))
-			return false;
-
-		// No var to check.
+		// No var no set.
 		if (empty($var))
 			return false;
 
@@ -30,10 +27,24 @@ class Ohara
 		loadLanguage(static::$name);
 
 		if (!empty($txt[static::$name .'_'. $var]))
-			return $txt[static::$name .'_'. $var];
+			self::$text[$var] =  $txt[static::$name .'_'. $var];
 
 		else
+			self::$text[$var] = false;
+	}
+
+	public function text($var)
+	{
+		global $txt;
+
+		// This should be extended by somebody else...
+		if (empty(static::$name) || empty($var))
 			return false;
+
+		if (!isset(self::$text[$var]))
+			$this->setText($var);
+
+		return self::$text[$var];
 	}
 
 	public function enable($var)
@@ -77,11 +88,12 @@ class Ohara
 
 	public function validate($var, $type = 'request')
 	{
-		$this->_types = array('request' => $_REQUEST, 'get' => $_GET, 'post' => $_POST);
+		$types = array('request' => $_REQUEST, 'get' => $_GET, 'post' => $_POST);
 
 		$this->_request = (empty($type) || !isset($types[$type])) ? $_REQUEST : $types[$type];
 
-		return (isset($this->_request[$var]));
+		unset($types);
+		return (in_array($var, $this->_request));
 	}
 
 	public function sanitize($var)
