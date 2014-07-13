@@ -3,17 +3,33 @@ Ohara
 
 A helper class to be used by SMF modifications (Mods).
 
-####To be able to use this helper class you need to follow some requirements:
+#### To be able to use this helper class you need to follow some requirements:
 
-- Needs PHP 5.3 or higher.
-- Include it or require it on your own file.
-- Need to load your file wherever you're gonna need it, either via a hook or some other method.
-- Extend the parent class Ohara.
-- Call the parent on construct:
+- Needs PHP 5.3 or higher. SMF 2.1.
+- Include it or require it on your own file. You can also use composer:
+
+ ```json
+"require": {
+		"suki/ohara": "dev-master",
+	}
+ ```
+
+- Extend the parent class Ohara using the Suki\Ohara namespace:
 
  ```php
-parent::__construct();
+class YourClass extends Suki\Ohara
+{
+...
  ```
+
+- You need to define the $name property, ideally from a declaration:
+
+  ```php
+public static $name = __CLASS__;
+ ```
+
+- Optionally, you can call $this->setRegistry() on your __construct method to register your class and make it available for other classes extending Ohara.
+
 
 - All your settings ($modSettings) and text strings ($txt) must follow the same pattern:
 
