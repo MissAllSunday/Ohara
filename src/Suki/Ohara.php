@@ -13,8 +13,9 @@ namespace Suki;
 class Ohara
 {
 	public $name = '';
-	protected $text = array();
-	protected static $registry = array();
+	protected $_text = array();
+	protected static $_registry = array();
+	protected $_request = array();
 
 	public function getName()
 	{
@@ -25,12 +26,12 @@ class Ohara
 	{
 		global $context;
 
-		self::$registry[$this->name] = $this;
+		self::$_registry[$this->name] = $this;
 	}
 
 	public function getRegistry($instance = '')
 	{
-		return $instance ? self::$registry[$instance] : self::$registry;
+		return $instance ? self::$_registry[$instance] : self::$_registry;
 	}
 
 	public function text($var)
@@ -41,10 +42,10 @@ class Ohara
 		if (empty($this->name) || empty($var))
 			return false;
 
-		if (!isset($this->text[$var]))
+		if (!isset($this->_text[$var]))
 			$this->setText($var);
 
-		return $this->text[$var];
+		return $this->_text[$var];
 	}
 
 	protected function setText($var)
@@ -59,15 +60,15 @@ class Ohara
 		loadLanguage($this->name);
 
 		if (!empty($txt[$this->name .'_'. $var]))
-			$this->text[$var] =  $txt[$this->name .'_'. $var];
+			$this->_text[$var] =  $txt[$this->name .'_'. $var];
 
 		else
-			$this->text[$var] = false;
+			$this->_text[$var] = false;
 	}
 
 	public function getAllText()
 	{
-		return $this->text;
+		return $this->_text;
 	}
 
 	public function enable($var)
