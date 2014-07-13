@@ -24,8 +24,6 @@ class Ohara
 
 	public function setRegistry()
 	{
-		global $context;
-
 		self::$_registry[$this->name] = $this;
 	}
 
