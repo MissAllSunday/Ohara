@@ -109,8 +109,6 @@ class Ohara
 		if (empty($var))
 			return false;
 
-		global $modSettings;
-
 		if (isset($modSettings[$var]))
 			return $modSettings[$var];
 
@@ -125,6 +123,10 @@ class Ohara
 
 	public function validate($var, $type = 'request')
 	{
+		// $var should always be a string, it should be the name of the var you want to validate, not the actual var!
+		if (!is_string($var))
+			return false;
+
 		$types = array('request' => $_REQUEST, 'get' => $_GET, 'post' => $_POST);
 
 		$this->_request = (empty($type) || !isset($types[$type])) ? $_REQUEST : $types[$type];
