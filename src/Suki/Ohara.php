@@ -24,6 +24,16 @@ class Ohara
 
 	public function setRegistry()
 	{
+		global $sourcedir, $scripturl, $smcFunc;
+		global $settings, $boarddir, $boardurl;
+
+		$this->sourceDir = $sourcedir;
+		$this->scriptUrl = $scripturl;
+		$this->smcFunc = $smcFunc;
+		$this->settings = $settings;
+		$this->boardDir = $boarddir;
+		$this->boardUrl = $boardurl;
+
 		self::$_registry[$this->name] = $this;
 	}
 
