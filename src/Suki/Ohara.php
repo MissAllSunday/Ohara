@@ -161,4 +161,33 @@ class Ohara
 
 		return $var;
 	}
+
+	public function setMessage($key, $message)
+	{
+		if (empty($key) || empty($message))
+			return false;
+
+		if (!isset($_SESSION[$this->name][$key]))
+			$_SESSION[$this->name][$key] = $message;
+	}
+
+	public function getMessage($key)
+	{
+		if (empty($key))
+			return false;
+
+		$message =  !empty($_SESSION[$this->name][$key]) ? $_SESSION[$this->name][$key] : false;
+
+		$this->cleanMessage($key);
+
+		return $message;
+	}
+
+	public function cleanMessage($key)
+	{
+		if (empty($key))
+			return false;
+
+		unset($_SESSION[$this->name][$key]);
+	}
 }
