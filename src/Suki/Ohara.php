@@ -147,8 +147,6 @@ class Ohara
 
 	public function sanitize($var)
 	{
-		global $smcFunc;
-
 		if (is_array($var))
 		{
 			foreach ($var as $k => $v)
@@ -163,7 +161,7 @@ class Ohara
 				$var = (int)trim($var);
 
 			else if (is_string($var))
-				$var = $smcFunc['htmltrim']($smcFunc['htmlspecialchars']($var), ENT_QUOTES);
+				$var = $this->smcFunc['htmltrim']($this->smcFunc['htmlspecialchars']($var), ENT_QUOTES);
 
 			else
 				$var = 'error_' . $var;
