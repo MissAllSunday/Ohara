@@ -34,12 +34,12 @@ class Ohara
 		$this->boardDir = $boarddir;
 		$this->boardUrl = $boardurl;
 
-		self::$_registry[$this->name] = $this;
+		static::$_registry[$this->name] = $this;
 	}
 
 	public function getRegistry($instance = '')
 	{
-		return $instance ? self::$_registry[$instance] : self::$_registry;
+		return $instance ? static::$_registry[$instance] : static::$_registry;
 	}
 
 	public function text($var)
