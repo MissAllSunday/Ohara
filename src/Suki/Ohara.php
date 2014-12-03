@@ -150,6 +150,10 @@ class Ohara
 		if (!is_string($var))
 			return false;
 
+		// Forgot something?
+		if (empty($this->_request))
+			$this->setData();
+
 		return (isset($this->_request[$var]));
 	}
 
