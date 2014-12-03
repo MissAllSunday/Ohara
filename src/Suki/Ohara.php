@@ -126,22 +126,30 @@ class Ohara
 			return false;
 	}
 
-	public function data($var)
+	public function setData($type = 'request')
 	{
-		return $this->validate($var) ? $this->sanitize($this->_request[$var]) : false;
-	}
-
-	public function validate($var, $type = 'request')
-	{
-		// $var should always be a string, it should be the name of the var you want to validate, not the actual var!
-		if (!is_string($var))
-			return false;
-
 		$types = array('request' => $_REQUEST, 'get' => $_GET, 'post' => $_POST);
 
 		$this->_request = (empty($type) || !isset($types[$type])) ? $_REQUEST : $types[$type];
 
 		unset($types);
+	}
+
+	public function data($var)
+	{
+		// Forgot something?
+		if (empty($this->_request))
+			$this->setData();
+
+		return $this->validate($var) ? $this->sanitize($this->_request[$var]) : false;
+	}
+
+	public function validate($var)
+	{
+		// $var should always be a string, it should be the name of the var you want to validate, not the actual var!
+		if (!is_string($var))
+			return false;
+
 		return (isset($this->_request[$var]));
 	}
 
@@ -157,14 +165,13 @@ class Ohara
 
 		else
 		{
-			if (is_numeric($var))
-				$var = (int)trim($var);
+			$var = (string) $this->smcFunc['htmltrim']($this->smcFunc['htmlspecialchars']($var), ENT_QUOTES);
 
-			else if (is_string($var))
-				$var = $this->smcFunc['htmltrim']($this->smcFunc['htmlspecialchars']($var), ENT_QUOTES);
+			if (ctype_digit($var))
+				$var = (int) $var;
 
-			else
-				$var = 'error_' . $var;
+			if (empty($var))
+				$var = false;
 		}
 
 		return $var;
