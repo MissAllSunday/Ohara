@@ -1,6 +1,6 @@
 {
 	"name": "suki/ohara",
-	"type": "library",
+	"type": "smf-module",
 	"description": "Helper class for SMF mods",
 	"keywords": ["SMF","modifications"],
 	"homepage": "http://github.com/MissAllSunday/Ohara",
@@ -14,7 +14,8 @@
 		}
 	],
 	"require": {
-		"php": ">=5.3.0"
+		"php": ">=5.3.0",
+		"composer/installers": "~1.0"
 	},
 	"autoload": {
 		"psr-0": {
