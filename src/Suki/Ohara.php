@@ -16,6 +16,11 @@ class Ohara
 	protected $_text = array();
 	protected static $_registry = array();
 	protected $_request = array();
+	public $sourceDir;
+	public $scriptUrl;
+	public $settings;
+	public $boardDir;
+	public $boardUrl;
 
 	public function getName()
 	{
@@ -24,12 +29,11 @@ class Ohara
 
 	public function setRegistry()
 	{
-		global $sourcedir, $scripturl, $smcFunc;
+		global $sourcedir, $scripturl;
 		global $settings, $boarddir, $boardurl;
 
 		$this->sourceDir = $sourcedir;
 		$this->scriptUrl = $scripturl;
-		$this->smcFunc = $smcFunc;
 		$this->settings = $settings;
 		$this->boardDir = $boarddir;
 		$this->boardUrl = $boardurl;
