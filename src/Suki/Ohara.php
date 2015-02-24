@@ -16,11 +16,6 @@ class Ohara
 	protected $_text = array();
 	protected static $_registry = array();
 	protected $_request = array();
-	public $sourceDir;
-	public $scriptUrl;
-	public $settings;
-	public $boardDir;
-	public $boardUrl;
 
 	public function getName()
 	{
@@ -185,32 +180,50 @@ class Ohara
 		return $var;
 	}
 
-	public function setMessage($key, $message)
+	public function setUpdate($key, $message)
 	{
+		// Define an update key for this class.
+		if (!isset($_SESSION[$this->name]['update']))
+			$_SESSION[$this->name]['update'] = array();
+
+		// We need a key and an actual message...
 		if (empty($key) || empty($message))
 			return false;
 
-		if (!isset($_SESSION[$this->name][$key]))
-			$_SESSION[$this->name][$key] = $message;
+		// Store it! or overwrite it!
+		if (!isset($_SESSION[$this->name]['update'][$key]))
+			$_SESSION[$this->name]['update'][$key] = $message;
 	}
 
-	public function getMessage($key)
+	public function getUpdate($key)
 	{
 		if (empty($key))
 			return false;
 
-		$message =  !empty($_SESSION[$this->name][$key]) ? $_SESSION[$this->name][$key] : false;
+		$update =  !empty($_SESSION[$this->name][$key]) ? $_SESSION[$this->name][$key] : false;
 
-		$this->cleanMessage($key);
+		foreach ($update as $key => $m)
+			$this->cleanUpdate($key);
 
-		return $message;
+		return $update;
 	}
 
-	public function cleanMessage($key)
+	public function getAllUpdates()
+	{
+		$update =  !empty($_SESSION[$this->name]['update']) ? $_SESSION[$this->name]['update'] : false;
+
+		if (!empty($update))
+			foreach ($update as $k => $v)
+				$this->cleanUpdate($k);
+
+		return $update;
+	}
+
+	public function cleanUpdate($key)
 	{
 		if (empty($key))
 			return false;
 
-		unset($_SESSION[$this->name][$key]);
+		unset($_SESSION[$this->name]['update'][$key]);
 	}
 }
