@@ -83,7 +83,7 @@ class Ohara
 	 */
 	public function getRegistry($instance = '')
 	{
-		return $instance ? static::$_registry[$instance] : static::$_registry;
+		return $instance ? (!empty(static::$_registry[$instance]) ? static::$_registry[$instance] : false) : (!empty(static::$_registry) ? static::$_registry : false);
 	}
 
 	/**
