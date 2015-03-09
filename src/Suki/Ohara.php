@@ -270,6 +270,8 @@ class Ohara
 	 */
 	public function sanitize($var)
 	{
+		global $smcFunc;
+
 		if (is_array($var))
 		{
 			foreach ($var as $k => $v)
@@ -280,7 +282,7 @@ class Ohara
 
 		else
 		{
-			$var = (string) $this->smcFunc['htmltrim']($this->smcFunc['htmlspecialchars']($var), ENT_QUOTES);
+			$var = (string) $smcFunc['htmltrim']($this->smcFunc['htmlspecialchars']($var), ENT_QUOTES);
 
 			if (ctype_digit($var))
 				$var = (int) $var;
