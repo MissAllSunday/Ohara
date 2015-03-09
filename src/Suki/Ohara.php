@@ -282,7 +282,7 @@ class Ohara
 
 		else
 		{
-			$var = (string) $smcFunc['htmltrim']($this->smcFunc['htmlspecialchars']($var), ENT_QUOTES);
+			$var = (string) $smcFunc['htmltrim']($smcFunc['htmlspecialchars']($var), ENT_QUOTES);
 
 			if (ctype_digit($var))
 				$var = (int) $var;
