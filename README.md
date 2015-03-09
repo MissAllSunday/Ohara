@@ -10,7 +10,7 @@ A helper class to be used by SMF modifications (Mods).
 
  ```json
 "require": {
-		"suki/ohara": "dev-master",
+		"suki/ohara": "~1.0",
 	}
  ```
 
