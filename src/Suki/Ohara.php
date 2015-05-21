@@ -434,4 +434,22 @@ class Ohara
 
 		$actions[$name] = array($file, $call);
 	}
+
+	/**
+	 * Creates a copyright link on the credits page.
+	 * Uses {@link $_modHooks} to determinate if a link should be added
+	 * Uses a predefined $txt string $this->text('modCredits')
+	 * @access public
+	 * @return void
+	 */
+	public function addCredits()
+	{
+		global $context;
+
+		// This needs to be extended by someone else!
+		if (!$this->_modHooks['credits'])
+			return;
+
+		$context['copyrights']['mods'][] = $this->text('modCredits');
+	}
 }
