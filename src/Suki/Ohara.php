@@ -367,4 +367,22 @@ class Ohara
 
 		unset($_SESSION[$this->name]['update'][$key]);
 	}
+
+	/**
+	 * Checks and returns a coma separated string.
+	 * @access public
+	 * @param string $string The string to check and format
+	 * @return string|bool
+	 */
+	public function commaSeparated($string)
+	{
+		return empty($string) ? false : implode(',', array_filter(explode(',', preg_replace(
+				array(
+					'/[^\d,]/',
+					'/(?<=,),+/',
+					'/^,+/',
+					'/,+$/'
+				), '', $string
+			))));
+	}
 }
