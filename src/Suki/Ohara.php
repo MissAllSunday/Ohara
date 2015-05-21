@@ -417,4 +417,21 @@ class Ohara
 				), '', $string
 			))));
 	}
+
+	/**
+	 * Creates a new SMF action.
+	 * Uses {@link $_modHooks} to determinate the name and file for the action, if no data is given, {@link $name} will be used
+	 * @access public
+	 * @param array $actions An array containing all current registered SMF actions at the moment of this method execution
+	 * @return void
+	 */
+	public function addActions(&$actions)
+	{
+		// Set some default values.
+		$name = !empty($this->_modHooks['action']['name']) ? $this->_modHooks['action']['name'] : $this->name;
+		$file = !empty($this->_modHooks['action']['file']) ? $this->_modHooks['action']['file'] : $this->name .'.php';
+		$call = !empty($this->_modHooks['action']['callable']) ? $this->_modHooks['action']['callable'] : $this->name .'::call#';
+
+		$actions[$name] = array($file, $call);
+	}
 }
