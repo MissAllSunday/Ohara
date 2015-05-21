@@ -369,6 +369,38 @@ class Ohara
 	}
 
 	/**
+	 * Parses and replace tokens by their given values.
+	 * also automatically adds the session var for url tokens.
+	 * @access public
+	 * @param string $text The raw text.
+	 * @param array $replacements a key => value array containing all tokens to be replaced.
+	 * @return string|bool
+	 */
+	public function parser($text, $replacements = array())
+	{
+		global $context;
+
+		if (empty($text) || empty($replacements) || !is_array($replacements))
+			return '';
+
+		// Inject the session.
+		$s = ';'. $context['session_var'] .'='. $context['session_id'];
+
+		// Split the replacements up into two arrays, for use with str_replace.
+		$find = array();
+		$replace = array();
+
+		foreach ($replacements as $f => $r)
+		{
+			$find[] = '{' . $f . '}';
+			$replace[] = $r . ((strpos($f,'href') !== false) ? $s : '');
+		}
+
+		// Do the variable replacements.
+		return str_replace($find, $replace, $text);
+	}
+
+	/**
 	 * Checks and returns a coma separated string.
 	 * @access public
 	 * @param string $string The string to check and format
