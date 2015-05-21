@@ -452,4 +452,17 @@ class Ohara
 
 		$context['copyrights']['mods'][] = $this->text('modCredits');
 	}
+
+	/**
+	 * Magic method to check properties.
+	 * uses variable variables.
+	 * @access public
+	 * @param string $string The var name to check
+	 * @return bool
+	 */
+	public function __isset($name)
+	{
+		// Directly check the property
+		return !empty($this->{$name});
+	}
 }
