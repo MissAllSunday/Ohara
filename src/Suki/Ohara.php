@@ -3,8 +3,8 @@
 /**
  * @package Ohara helper class
  * @version 1.0
- * @author Jessica Gonz·lez <suki@missallsunday.com>
- * @copyright Copyright (c) 2014, Jessica Gonz·lez
+ * @author Jessica Gonz√°lez <suki@missallsunday.com>
+ * @copyright Copyright (c) 2014, Jessica Gonz√°lez
  * @license http://www.mozilla.org/MPL/2.0/
  */
 
@@ -19,6 +19,7 @@ class Ohara
 {
 	/**
 	 * The main identifier for the class extending Ohara, needs to be re-defined by each extending class
+	 * Almot all methods on this class relies on this property so make sure it is unique and make sure your files are named after this var as well.
 	 * @access public
 	 * @var string
 	 */
@@ -58,6 +59,8 @@ class Ohara
 
 	/**
 	 * Registers your function on {@link $_registry} and sets many properties replacing SMF's global vars
+	 * Needs to be called by any class extending this class, preferable on a __construct method but can be called when/where necessary.
+	 * Calls {@link createHooks()} if there is any runtime hook.
 	 * @access public
 	 * @return void
 	 */
@@ -73,6 +76,10 @@ class Ohara
 		$this->boardUrl = $boardurl;
 
 		static::$_registry[$this->name] = $this;
+
+		// Any runtime hooks?
+		if ($this->_modHooks)
+			$this->createHooks();
 	}
 
 	/**
@@ -84,6 +91,38 @@ class Ohara
 	public function getRegistry($instance = '')
 	{
 		return $instance ? (!empty(static::$_registry[$instance]) ? static::$_registry[$instance] : false) : (!empty(static::$_registry) ? static::$_registry : false);
+	}
+
+	/**
+	 * Takes each defined hook in {@link $_modHooks} and tries to add the relevant data for each hook
+	 * Uses {@link $_availableHooks} to know which hook are going to be added
+	 * Uses {@link $_overwriteHooks} to let the mod author to overwrite all or any params before calling add_integration_function.
+	 * @access public
+	 */
+	public function createHooks()
+	{
+		foreach ($this->_modHooks as $hook => $data)
+		{
+			// The $data value acts as an "enable" check, empty means you do not want to use this hook.
+			if (empty($data))
+				continue;
+
+			$overwriteThis = !empty($this->_overwriteHooks[$hook]) ? $this->_overwriteHooks[$hook] : false;
+
+			// Set some default values.
+			$defaultValues = array(
+				'hookName' => $this->_availableHooks[$hook],
+				'func' => $this->name .'::add'. ucfirst($hook),
+				'permanent' => false,
+				'file' => '$sourcedir/'. $this->name .'.php',
+				'object' => true,
+			);
+
+			// You might or might not want to overwrite this...
+			extract(!empty($overwriteThis) ? array_merge($defaultValues, $overwriteThis) : $defaultValues);
+
+			add_integration_function($hookName, $func, $permanent, $file, $object);
+		}
 	}
 
 	/**
@@ -409,13 +448,13 @@ class Ohara
 	public function commaSeparated($string)
 	{
 		return empty($string) ? false : implode(',', array_filter(explode(',', preg_replace(
-				array(
-					'/[^\d,]/',
-					'/(?<=,),+/',
-					'/^,+/',
-					'/,+$/'
-				), '', $string
-			))));
+			array(
+				'/[^\d,]/',
+				'/(?<=,),+/',
+				'/^,+/',
+				'/,+$/'
+			), '', $string
+		))));
 	}
 
 	/**
