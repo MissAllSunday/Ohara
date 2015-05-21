@@ -26,6 +26,47 @@ class Ohara
 	public $name = '';
 
 	/**
+	 * A list of hooks and its inner data.
+	 * While {@link $_availableHooks} holds the hook's full name, this property holds the data that will be used on each hook call.
+	 * The "key" is used as a short reference to help identify each hook, the "value" is a mixed var, could be a boolean, a string or an array depending on the hook been called. The "value" acts as an "enable" check, if it contains an non empty var the hook is processed otherwise the value is set to the hook's corresponding type of var on its empty state (false, array(), '').
+	 * Hooks that do not pass any data should be set to a boolean.
+	 * Needs to be defined/extended/modified BEFORE calling {@link getRegistry()}
+	 * @access protected
+	 * @var array
+	 */
+	protected $_modHooks = array(
+		'credits' => false,
+		'actions' => array(),
+	);
+
+	/**
+	 * Special property to allow mod authors to overwrite every aspect of hooks called on runtime.
+	 * Contains a list of hooks to be overwritten.
+	 * Each hook contains an array of values, the list is as follows:
+	 * 'hookName' => The hook name, it gets defined by {@link $_availableHooks},
+	 * 'func' => The function that will be called for this hook, by default it uses {@$name} and adds a "add" prefix to the hook identifier, also assumes your function is a method.
+	 * 'permanent' => To let SMF know if this hook will be permanently added to the DB, default is false.
+	 * 'file' => The file to be loaded when this hook is called, useful if you have your function on another file, by default uses {@$name} for the filename and assumes its located on Sources folder.
+	 * 'object' => Boolean param to let SMF know if your function is suppose to be called as an instantiated method or not, only valid if your function is a method.
+	 * Needs to be defined/extended/modified BEFORE calling {@link getRegistry()}
+	 * @access protected
+	 * @var array
+	 */
+	protected $_overwriteHooks = array();
+
+	/**
+	 * An array containing all supported hooks by default.
+	 * The "key" is used as a short reference to help identify each hook, the "value" is the full hook name.
+	 * Mod authors can extend this list and add support for any other hook not listed by default.
+	 * @access protected
+	 * @var array
+	 */
+	protected $_availableHooks = array(
+		'credits' => 'integrate_credits',
+		'actions' => 'integrate_actions',
+	);
+
+	/**
 	 * Text array for holding your own text strings
 	 * @access protected
 	 * @var array
