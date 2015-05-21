@@ -94,6 +94,17 @@ class Ohara
 	}
 
 	/**
+	 * Dummy method used by Ohara to run {@link createHooks()} via the child's __construct() method and {@link setRegistry()}.
+	 * Mod authors can extend this to run their own methods as this is intended to be called pretty early in SMF's process (using SMF's integrate_pre_load hook).
+	 * @access public
+	 * @return bool
+	 */
+	public function runTimeHooks()
+	{
+		return false;
+	}
+
+	/**
 	 * Takes each defined hook in {@link $_modHooks} and tries to add the relevant data for each hook
 	 * Uses {@link $_availableHooks} to know which hook are going to be added
 	 * Uses {@link $_overwriteHooks} to let the mod author to overwrite all or any params before calling add_integration_function.
