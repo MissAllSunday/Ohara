@@ -19,7 +19,7 @@ class Ohara
 {
 	/**
 	 * The main identifier for the class extending Ohara, needs to be re-defined by each extending class
-	 * Almot all methods on this class relies on this property so make sure it is unique and make sure your files are named after this var as well.
+	 * Almost all methods on this class relies on this property so make sure it is unique and make sure your files are named after this var as well.
 	 * @access public
 	 * @var string
 	 */
@@ -28,6 +28,7 @@ class Ohara
 	/**
 	 * A list of hooks and its inner data.
 	 * While {@link $_availableHooks} holds the hook's full name, this property holds the data that will be used on each hook call.
+	 * If a predefined method needs predefined data for the specific hook called, you need to set the requested data on this property using the hook inner name to identify it.
 	 * The "key" is used as a short reference to help identify each hook, the "value" is a mixed var, could be a boolean, a string or an array depending on the hook been called. The "value" acts as an "enable" check, if it contains an non empty var the hook is processed otherwise the value is set to the hook's corresponding type of var on its empty state (false, array(), '').
 	 * Hooks that do not pass any data should be set to a boolean.
 	 * Needs to be defined/extended/modified BEFORE calling {@link getRegistry()}
@@ -119,7 +120,7 @@ class Ohara
 		static::$_registry[$this->name] = $this;
 
 		// Any runtime hooks?
-		if ($this->_modHooks)
+		if ($this->_availableHooks)
 			$this->createHooks();
 	}
 
@@ -153,17 +154,17 @@ class Ohara
 	 */
 	public function createHooks()
 	{
-		foreach ($this->_modHooks as $hook => $data)
+		foreach ($this->_availableHooks as $hook => $hook_name)
 		{
-			// The $data value acts as an "enable" check, empty means you do not want to use this hook.
-			if (empty($data))
+			// The $hook_name value acts as an "enable" check, empty means you do not want to use this hook.
+			if (empty($hook_name))
 				continue;
 
 			$overwriteThis = !empty($this->_overwriteHooks[$hook]) ? $this->_overwriteHooks[$hook] : false;
 
 			// Set some default values.
 			$defaultValues = array(
-				'hookName' => $this->_availableHooks[$hook],
+				'hookName' => $hook_name,
 				'func' => $this->name .'::add'. ucfirst($hook),
 				'permanent' => false,
 				'file' => '$sourcedir/'. $this->name .'.php',
