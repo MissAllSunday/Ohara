@@ -463,8 +463,49 @@ class Ohara
 	}
 
 	/**
+	 * Outputs a json encoded string
+	 * It assumes the data is a valid array.
+	 * @param array $data The data to be converted, needs to be an array
+	 * @access public
+	 */
+	public function jsonResponse($data = array())
+	{
+		$json = '';
+		$result = false;
+
+		// Kill anything else
+		ob_end_clean();
+
+		// Defensive programming anyone?
+		if (empty($data))
+			return false;
+
+		if ($this->modSetting('CompressedOutput'))
+			@ob_start('ob_gzhandler');
+
+		else
+			ob_start();
+
+		// Set the header.
+		header('Content-Type: application/json');
+
+		// This is pretty simply, just encode the supplied data and be done with it.
+		$json = json_encode($data);
+
+		$result = json_last_error() == JSON_ERROR_NONE;
+
+		if ($result)
+			echo $json;
+
+		// Done
+		obExit(false);
+
+		return $result;
+	}
+
+	/**
 	 * Parses and replace tokens by their given values.
-	 * also automatically adds the session var for url tokens.
+	 * also automatically adds the session var for href tokens.
 	 * @access public
 	 * @param string $text The raw text.
 	 * @param array $replacements a key => value array containing all tokens to be replaced.
