@@ -467,27 +467,18 @@ class Ohara
 	 * It assumes the data is a valid array.
 	 * @param array $data The data to be converted, needs to be an array
 	 * @access public
+	 * @return boolean whether or not the data was encoded and outputted
 	 */
 	public function jsonResponse($data = array())
 	{
+		global $db_show_debug;
+
 		$json = '';
 		$result = false;
-
-		// Kill anything else
-		ob_end_clean();
 
 		// Defensive programming anyone?
 		if (empty($data))
 			return false;
-
-		if ($this->modSetting('CompressedOutput'))
-			@ob_start('ob_gzhandler');
-
-		else
-			ob_start();
-
-		// Set the header.
-		header('Content-Type: application/json');
 
 		// This is pretty simply, just encode the supplied data and be done with it.
 		$json = json_encode($data);
@@ -495,10 +486,28 @@ class Ohara
 		$result = json_last_error() == JSON_ERROR_NONE;
 
 		if ($result)
+		{
+			// Don't need extra stuff...
+			$db_show_debug = false;
+
+			// Kill anything else
+			ob_end_clean();
+
+			if ($this->modSetting('CompressedOutput'))
+				@ob_start('ob_gzhandler');
+
+			else
+				ob_start();
+
+			// Set the header.
+			header('Content-Type: application/json');
+
+			// Echo!
 			echo $json;
 
-		// Done
-		obExit(false);
+			// Done
+			obExit(false);
+		}
 
 		return $result;
 	}
