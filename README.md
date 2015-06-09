@@ -14,6 +14,9 @@ A helper class to be used by SMF modifications (Mods).
 	}
  ```
 
+  - Ohara uses [composer/installers](https://github.com/composer/installers) this means the class will be automatically placed inside SMF's Sources folder unless you overwrite it on your own composer.json file.
+
+
 - Extend the parent class Ohara using the Suki\Ohara namespace:
 
  ```php
