@@ -3,8 +3,8 @@
 /**
  * @package Ohara helper class
  * @version 1.0
- * @author Jessica Gonz√°lez <suki@missallsunday.com>
- * @copyright Copyright (c) 2014, Jessica Gonz√°lez
+ * @author Jessica Gonz·lez <suki@missallsunday.com>
+ * @copyright Copyright (c) 2014, Jessica Gonz·lez
  * @license http://www.mozilla.org/MPL/2.0/
  */
 
@@ -38,6 +38,7 @@ class Ohara
 	protected $_modHooks = array(
 		'credits' => false,
 		'actions' => array(),
+		'helpAdmin' => '',
 	);
 
 	/**
@@ -59,13 +60,14 @@ class Ohara
 	 * An array containing all supported hooks by default.
 	 * The "key" is used as a short reference to help identify each hook, the "value" is the full hook name.
 	 * Mod authors can extend this list and add support for any other hook not listed by default.
+	 * The following hooks are supported by default:
+		'credits' => 'integrate_credits',
+		'actions' => 'integrate_actions',
+		'helpAdmin' => 'integrate_helpadmin',
 	 * @access protected
 	 * @var array
 	 */
-	protected $_availableHooks = array(
-		'credits' => 'integrate_credits',
-		'actions' => 'integrate_actions',
-	);
+	protected $_availableHooks = array();
 
 	/**
 	 * Text array for holding your own text strings
@@ -519,6 +521,10 @@ class Ohara
 	 */
 	public function addActions(&$actions)
 	{
+		// This needs to be set and extended by someone else!
+		if (!$this->_availableHooks['actions'])
+			return;
+
 		// Set some default values.
 		$name = !empty($this->_modHooks['action']['name']) ? $this->_modHooks['action']['name'] : $this->name;
 		$file = !empty($this->_modHooks['action']['file']) ? $this->_modHooks['action']['file'] : $this->name .'.php';
@@ -538,11 +544,31 @@ class Ohara
 	{
 		global $context;
 
-		// This needs to be extended by someone else!
-		if (!$this->_modHooks['credits'])
+		// This needs to be set and extended by someone else!
+		if (!$this->_availableHooks['credits'])
 			return;
 
 		$context['copyrights']['mods'][] = $this->text('modCredits');
+	}
+
+	/**
+	 * Loads a language file.
+	 * Used to load a language to properly display any help txt strings from mods that adds new permissions via hooks
+	 * Uses {@link $_modHooks} if the mod author wants to specify a custom file name, if not, it defaults to {@link $name}
+	 * @access public
+	 * @return void
+	 */
+	public function addHelpAdmin()
+	{
+		// This needs to be set and extended by someone else!
+		if (!$this->_availableHooks['helpAdmin'])
+			return;
+
+		// You may or may not want to load a different language file.
+		$loadLang = !empty($this->_modHooks['helpAdmin']) ? $this->_modHooks['helpAdmin'] : $this->name;
+
+		// Load your precious help txt strings!
+		loadLanguage($loadLang);
 	}
 
 	/**
