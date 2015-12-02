@@ -605,18 +605,48 @@ class Ohara
 	 * Checks and returns a comma separated string.
 	 * @access public
 	 * @param string $string The string to check and format
+	 * @param string $type The type to check against. Accepts "numeric", "alpha" and "alphanumeric".
 	 * @return string|bool
 	 */
-	public function commaSeparated($string)
+	public function commaSeparated($string, $type = 'alphanumeric')
 	{
+		switch ($type) {
+			case 'numeric':
+				$t = '\d';
+				break;
+			case 'alpha':
+				$t = '[:alpha:]';
+				break;
+			case 'alphanumeric':
+			default:
+				$t = '[:alnum:]';
+				break;
+		}
 		return empty($string) ? false : implode(',', array_filter(explode(',', preg_replace(
 			array(
-				'/[^\d,]/',
+				'/[^'. $t .',]/',
 				'/(?<=,),+/',
 				'/^,+/',
 				'/,+$/'
 			), '', $string
 		))));
+	}
+
+	/**
+	 * Returns a formatted string.
+	 * @access public
+	 * @param string|int  $bytes A number of bytes.
+	 * @param bool $showUnits To show the unit symbol or not.
+	 * @return string
+	 */
+	public function formatBytes($bytes, $showUnits = false)
+	{
+		$units = array('B', 'KB', 'MB', 'GB', 'TB');
+		$bytes = max($bytes, 0);
+		$pow = floor(($bytes ? log($bytes) : 0) / log(1024));
+		$pow = min($pow, count($units) - 1);
+		$bytes /= (1 << (10 * $pow));
+		return round($bytes, 4) . ($showUnits ? ' ' . $units[$pow] : '');
 	}
 
 	/**
