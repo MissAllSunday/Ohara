@@ -467,8 +467,7 @@ class Ohara
 			return false;
 
 		// Store it! or overwrite it!
-		if (!isset($_SESSION[$this->name]['update'][$key]))
-			$_SESSION[$this->name]['update'][$key] = $message;
+		$_SESSION[$this->name]['update'][$key] = $message;
 	}
 
 	/**
