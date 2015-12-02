@@ -9,6 +9,7 @@
  */
 
 namespace Suki;
+use Suki\ClassLoader;
 
 /**
  * Helper class for SMF modifications
@@ -69,6 +70,12 @@ class Ohara
 	 */
 	protected $_availableHooks = array();
 
+	protected $_libNamespace = array();
+
+	protected $_libPSR = array();
+
+	protected $_libClassMap = array();
+
 	/**
 	 * Text array for holding your own text strings
 	 * @access protected
@@ -91,6 +98,8 @@ class Ohara
 	 */
 	protected $_request = array();
 
+	protected static $loader;
+
 	/**
 	 * Getter for {@link $name} property.
 
@@ -99,6 +108,57 @@ class Ohara
 	public function getName()
 	{
 		return $this->name;
+	}
+
+	public function autoLoad($force = false)
+	{
+		if (null !== self::$loader && !$force)
+			return self::$loader;
+
+		// Yep, manually loaded...
+		require_once ($this->sourceDir .'/ohara/src/Suki/ClassLoader.php');
+
+		// Define some of the most commonly used dirs.
+		$vendorDir = $this->boardDir .'/vendor';
+		$baseDir = dirname($vendorDir);
+		self::$loader = $loader = new ClassLoader();
+		$replacements = array(
+			'$vendorDir' => $vendorDir,
+			'$baseDir' => $baseDir,
+			'$boarddir' => $this->boardDir,
+			'$sourcedir' => $this->sourceDir,
+		);
+
+		if ($this->_libNamespace)
+			foreach ($this->_libNamespace as $namespace => $path)
+			{
+				$path = (array) $path;
+				$path[0] = $this->parser($path[0], $replacements);
+				$loader->set($namespace, $path);
+			}
+
+		if ($this->_libPSR)
+			foreach ($this->libPSR as $namespace => $path)
+			{
+				$path = (array) $path;
+				$path[0] = $this->parser($path[0], $replacements);
+				$loader->setPsr4($namespace, $this->parser($path, $replacements));
+			}
+
+		if ($this->_libClassMap)
+			foreach ($this->libPSR as $name => $classMap)
+			{
+				$that = $this;
+				$classMap = (array) $classMap;
+				$classMap = array_map(function($map) use ($that, $replacements) { return $that->parser($map, $replacements); }, $classMap);
+				$path[0] = $this->parser($path[0], $replacements);
+				$loader->addClassMap($this->parser($classMap, $replacements));
+				unset($that);
+			}
+
+		$loader->register(true);
+
+		return $loader;
 	}
 
 	/**
@@ -425,8 +485,9 @@ class Ohara
 
 		$update =  !empty($_SESSION[$this->name][$key]) ? $_SESSION[$this->name][$key] : false;
 
-		foreach ($update as $key => $m)
-			$this->cleanUpdate($key);
+		if (!empty($update))
+			foreach ($update as $key => $m)
+				$this->cleanUpdate($key);
 
 		return $update;
 	}
@@ -527,9 +588,6 @@ class Ohara
 		if (empty($text) || empty($replacements) || !is_array($replacements))
 			return '';
 
-		// Inject the session.
-		$s = ';'. $context['session_var'] .'='. $context['session_id'];
-
 		// Split the replacements up into two arrays, for use with str_replace.
 		$find = array();
 		$replace = array();
@@ -537,7 +595,7 @@ class Ohara
 		foreach ($replacements as $f => $r)
 		{
 			$find[] = '{' . $f . '}';
-			$replace[] = $r . ((strpos($f,'href') !== false) ? $s : '');
+			$replace[] = $r . ((strpos($f,'href') !== false) ? (';'. $context['session_var'] .'='. $context['session_id']) : '');
 		}
 
 		// Do the variable replacements.
