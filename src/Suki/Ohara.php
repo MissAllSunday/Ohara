@@ -603,7 +603,7 @@ class Ohara
 	}
 
 	/**
-	 * Checks and returns a coma separated string.
+	 * Checks and returns a comma separated string.
 	 * @access public
 	 * @param string $string The string to check and format
 	 * @return string|bool
