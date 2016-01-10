@@ -523,6 +523,31 @@ class Ohara
 	}
 
 	/**
+	 * Checks if a string contains a scheme. Adds one if necessary
+	 * checks for schemaless urls.
+	 * @param string $url The data to be converted, needs to be an array.
+	 * @param boolean $secure If a scheme has to be added, check if https should be used.
+	 * @access public
+	 * @return string The passed string.
+	 */
+	public function checkScheme($url = '', $secure = false)
+	{
+		$parsed = array();
+		$parsed = parse_url($url);
+		$pos = strpos($url, '//');
+
+		// Perhaps this is a schema less url? parse_url should detect schema less urls .___.
+		if (empty($parsed['scheme']) && strpos($url, '//') !== false)
+			return $url;
+
+		elseif (empty($parsed['scheme']))
+			return 'http'. ($secure ? 's' : '') .'://'. $url;
+
+		else
+			return $url;
+	}
+
+	/**
 	 * Outputs a json encoded string
 	 * It assumes the data is a valid array.
 	 * @param array $data The data to be converted, needs to be an array
