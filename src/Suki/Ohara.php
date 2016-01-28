@@ -199,7 +199,7 @@ class Ohara
 
 	/**
 	 * Dummy method used by Ohara to run {@link createHooks()} via the child's __construct() method and {@link setRegistry()}.
-	 * Mod authors can extend this to run their own methods as this is intended to be called pretty early in SMF's process (using SMF's integrate_pre_load hook).
+	 * Mod authors can extend this to run their own methods as this is intended to be called pretty early in SMF's process (using SMF's integrate_load_theme hook).
 	 * @access public
 	 * @return bool
 	 */
@@ -209,13 +209,15 @@ class Ohara
 	}
 
 	/**
-	 * Takes each defined hook in {@link $_modHooks} and tries to add the relevant data for each hook
+	 * Takes each defined hook in {@link $_availableHooks} and tries to add the relevant data for each hook
 	 * Uses {@link $_availableHooks} to know which hook are going to be added
 	 * Uses {@link $_overwriteHooks} to let the mod author to overwrite all or any params before calling add_integration_function.
 	 * @access public
 	 */
 	public function createHooks()
 	{
+		global $context;
+
 		foreach ($this->_availableHooks as $hook => $hook_name)
 		{
 			// The $hook_name value acts as an "enable" check, empty means you do not want to use this hook.
@@ -236,7 +238,38 @@ class Ohara
 			// You might or might not want to overwrite this...
 			extract(!empty($overwriteThis) ? array_merge($defaultValues, $overwriteThis) : $defaultValues);
 
-			add_integration_function($hookName, $func, $permanent, $file, $object);
+			// You can also disable any hook used by this mod from the mod's admin settings if the mod has that feature.
+			$hookAction = ($this->enable('disable_hook_'. $hook_name) ? 'remove' : 'add') .'_integration_function';
+
+			$hookAction($hookName, $func, $permanent, $file, $object);
+		}
+	}
+
+	/**
+	 * Takes each defined hook in {@link $_availableHooks} and tries to create an admin setting for it.
+	 * Uses a few specific text strings: disable_hook_title, disable_hook_desc, disable_hook and disable_hook_sub the only required text string is disable_hook.
+	 * Uses {@link $_availableHooks} to know which setting is going to be created
+	 * @param array $config_vars Passed by reference, a regular SMF's config_vars array.
+	 * @access public
+	 * @return void
+	 */
+	public function disableHooks(&$config_vars)
+	{
+		// A title and a description.
+		if ($this->text('disable_hook_title'))
+			$config_vars[] = array('title', 'Ohara_disableHooks_title', 'label' => $this->parser($this->text('disable_hook_title'), array('modname' => $this->name)));
+
+		if ($this->text('disable_hook_desc'))
+			$config_vars[] = array('desc', 'Ohara_disableHooks_desc', 'label' => $this->parser($this->text('disable_hook_desc'), array('modname' => $this->name)));
+
+		foreach ($this->_availableHooks as $hook => $hook_name)
+		{
+			// Hook has already been disabled, no point in disabling it again :P
+			if (empty($hook_name))
+				continue;
+
+			// Gotta "protect" the admin and settings hooks.
+			$config_vars[] = array('check', $this->name .'_disable_hook_'. $hook_name, 'disabled' => (strpos($hook_name, 'admin') !== false || strpos($hook_name, 'setting') !== false) ? true : false, 'label' => $this->parser($this->text('disable_hook'), array('hook' => $hook_name)), 'subtext' => ($this->text('disable_hook_sub') ? $this->parser($this->text('disable_hook_'. $hook .'_sub'), array('hook' => $hook)) : ''));
 		}
 	}
 
