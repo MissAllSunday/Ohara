@@ -631,10 +631,14 @@ class Ohara
 	 * @access public
 	 * @param string $string The string to check and format
 	 * @param string $type The type to check against. Accepts "numeric", "alpha" and "alphanumeric".
+	 * @param string $delimiter Used for explode7imploding the string.
 	 * @return string|bool
 	 */
-	public function commaSeparated($string, $type = 'alphanumeric')
+	public function commaSeparated($string, $type = 'alphanumeric', $delimiter = ',')
 	{
+		if (empty($string))
+			return false;
+
 		switch ($type) {
 			case 'numeric':
 				$t = '\d';
@@ -647,7 +651,7 @@ class Ohara
 				$t = '[:alnum:]';
 				break;
 		}
-		return empty($string) ? false : implode(',', array_filter(explode(',', preg_replace(
+		return empty($string) ? false : implode($delimiter, array_filter(explode($delimiter, preg_replace(
 			array(
 				'/[^'. $t .',]/',
 				'/(?<=,),+/',
