@@ -218,6 +218,10 @@ class Ohara
 	{
 		global $context;
 
+		// Don't execute on uninstall.
+		if (!empty($context['uninstalling']) || $this->data('sa') == 'uninstall2')
+			return;
+
 		foreach ($this->_availableHooks as $hook => $hook_name)
 		{
 			// The $hook_name value acts as an "enable" check, empty means you do not want to use this hook.
