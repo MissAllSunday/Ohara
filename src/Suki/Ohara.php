@@ -89,24 +89,24 @@ class Ohara
 			'$sourcedir' => $this->sourceDir,
 		);
 
-		if ($this->_libNamespace)
-			foreach ($this->_libNamespace as $namespace => $path)
+		if ($this->config('libNamespace'))
+			foreach ($this->config('libNamespace') as $namespace => $path)
 			{
 				$path = (array) $path;
 				$path[0] = $this->parser($path[0], $replacements);
 				$loader->set($namespace, $path);
 			}
 
-		if ($this->_libPSR)
-			foreach ($this->libPSR as $namespace => $path)
+		if ($this->config('libPSR'))
+			foreach ($this->config('libPSR') as $namespace => $path)
 			{
 				$path = (array) $path;
 				$path[0] = $this->parser($path[0], $replacements);
 				$loader->setPsr4($namespace, $this->parser($path, $replacements));
 			}
 
-		if ($this->_libClassMap)
-			foreach ($this->libPSR as $name => $classMap)
+		if ($this->config('libClassMap'))
+			foreach ($this->config('libClassMap') as $name => $classMap)
 			{
 				$that = $this;
 				$classMap = (array) $classMap;
@@ -145,8 +145,7 @@ class Ohara
 		$this->getConfigFile();
 
 		// Any runtime hooks?
-		if ($this->_availableHooks)
-			$this->createHooks();
+		$this->createHooks();
 	}
 
 	/**
@@ -293,7 +292,6 @@ class Ohara
 
 		if ($this->text('disable_hook_desc'))
 			$config_vars[] = array('desc', 'Ohara_disableHooks_desc', 'label' => $this->parser($this->text('disable_hook_desc'), array('modname' => $this->name)));
-
 
 		foreach ($hooks as $hook => $hook_name)
 		{
