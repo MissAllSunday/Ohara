@@ -804,6 +804,67 @@ class Ohara
 	}
 
 	/**
+	 * Creates an entire new admin setting.
+	 * By default calls a file named $this->name .'Admin.php' this is because if a mod adds an entire admin page, it prob will have a few subsections and as such, a new file is needed.
+	 * @access public
+	 * @param array $areas The entire SMF area array passed by reference.
+	 * @return void
+	 */
+	public function addAdminArea(&$areas)
+	{
+		// This needs to be set and extended by someone else!
+		$hooks = $this->config('availableHooks');
+
+		if (!$hooks['adminArea'])
+			return;
+
+		$customArea = $this->config('adminArea');
+
+		// Custom settings?
+		$subSections = $this->config('adminSubsections') ? $this->config('adminSubsections') : array();
+
+		$areas['config']['areas'][$this->name] = array(
+			'label' => !empty($customArea['label']) ? $customArea['label'] : $this->text('modName'),
+			'file' => !empty($customArea['file']) ? $customArea['file'] : $this->name .'Admin.php',
+			'function' => !empty($customArea['function']) ? $customArea['function'] : $this->name .'::addAdminCall#',
+			'icon' => !empty($customArea['icon']) ? $customArea['icon'] : 'posts',
+			'subsections' => array_merge(array(
+				'settings' => array($this->text('modName')),
+			), $subSections),
+		);
+	}
+
+	/**
+	 * A dispatcher method.
+	 * Uses $config['adminSubsections'] to determinate which subaction needs to be called.
+	 * @access public
+	 * @return void
+	 */
+	public function addAdminCall()
+	{
+		global $context;
+
+		require_once($this->sourceDir . '/ManageSettings.php');
+
+		$context['page_title'] = $this->text('modName');
+
+		// Add or overwrite the default subsection.
+		$subSections = array_merge(array(
+			'settings' => array($this->text('modName')),
+		), ($this->config('adminSubsections') ? array_keys($this->config('adminSubsections')) : array()));
+
+		// Load some stuff.
+		loadGeneralSettingParameters($subSections, 'settings');
+
+		// Does the subsection exists? defaults to "settings".
+		$this->_sa = isset($subSections[$this->data('sa')]) ? $subSections[$this->data('sa')] : 'settings';
+
+		// Yep, heres a valid example of a parent class having to call a child's method.
+		if(method_exists($this, $this->_sa))
+			$this->{$this->_sa}();
+	}
+
+	/**
 	 * Loads a language file.
 	 * Used to load a language to properly display any help txt strings from mods that adds new permissions via hooks
 	 * Uses {@link $_modHooks} if the mod author wants to specify a custom file name, if not, it defaults to {@link $name}
