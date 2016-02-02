@@ -752,15 +752,35 @@ class Ohara
 	public function addActions(&$actions)
 	{
 		// This needs to be set and extended by someone else!
-		if (!$this->_availableHooks['actions'])
+		$hooks = $this->config('availableHooks');
+		$oActions = $this->config('actions');
+		$counter = 0;
+
+		if (empty($hooks['actions']))
 			return;
 
-		// Set some default values.
-		$name = !empty($this->_modHooks['action']['name']) ? $this->_modHooks['action']['name'] : $this->name;
-		$file = !empty($this->_modHooks['action']['file']) ? $this->_modHooks['action']['file'] : $this->name .'.php';
-		$call = !empty($this->_modHooks['action']['callable']) ? $this->_modHooks['action']['callable'] : $this->name .'::call#';
+		// An array?
+		if (is_array($oActions))
+			foreach ($oActions as $a)
+			{
+				// This needs a name... provide a generic one.
+				$counter++;
 
-		$actions[$name] = array($file, $call);
+				$name = !empty($a['name']) ? $a['name'] : $this->name . $counter;
+				$file = !empty($a['file']) ? $a['file'] : $this->name .'.php';
+				$call = !empty($a['callable']) ? $a['callable'] : $this->name .'::call#';
+
+				$actions[$name] = array($file, $call);
+			}
+
+		else
+		{
+			$name = !empty($oActions['name']) ? $oActions['name'] : $this->name;
+			$file = !empty($oActions['file']) ? $oActions['file'] : $this->name .'.php';
+			$call = !empty($oActions['callable']) ? $oActions['callable'] : $this->name .'::call#';
+
+			$actions[$name] = array($file, $call);
+		}
 	}
 
 	/**
