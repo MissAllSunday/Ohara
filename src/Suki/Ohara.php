@@ -795,10 +795,12 @@ class Ohara
 		global $context;
 
 		// This needs to be set and extended by someone else!
-		if (!$this->_availableHooks['credits'])
+		$hooks = $this->config('availableHooks');
+
+		if (!$hooks['credits'])
 			return;
 
-		$context['copyrights']['mods'][] = $this->text('modCredits');
+		$context['copyrights']['mods'][] = is_string($hooks['credits']) ? $this->text($hooks['credits']) : $this->text('modCredits');
 	}
 
 	/**
