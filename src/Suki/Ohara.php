@@ -813,11 +813,13 @@ class Ohara
 	public function addHelpAdmin()
 	{
 		// This needs to be set and extended by someone else!
-		if (!$this->_availableHooks['helpAdmin'])
+		$hooks = $this->config('availableHooks');
+
+		if (!$hooks['helpAdmin'])
 			return;
 
 		// You may or may not want to load a different language file.
-		$loadLang = !empty($this->_modHooks['helpAdmin']) ? $this->_modHooks['helpAdmin'] : $this->name;
+		$loadLang = is_string($hooks['helpAdmin']) ? $hooks['helpAdmin'] : $this->name;
 
 		// Load your precious help txt strings!
 		loadLanguage($loadLang);
