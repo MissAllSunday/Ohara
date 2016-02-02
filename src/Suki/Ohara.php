@@ -221,8 +221,6 @@ class Ohara
 
 	/**
 	 * Takes each defined hook in {@link $_availableHooks} and tries to add the relevant data for each hook
-	 * Uses {@link $_availableHooks} to know which hook are going to be added
-	 * Uses {@link $_overwriteHooks} to let the mod author to overwrite all or any params before calling add_integration_function.
 	 * @access public
 	 */
 	public function createHooks()
@@ -277,13 +275,18 @@ class Ohara
 	/**
 	 * Takes each defined hook in {@link $_availableHooks} and tries to create an admin setting for it.
 	 * Uses a few specific text strings: disable_hook_title, disable_hook_desc, disable_hook and disable_hook_sub the only required text string is disable_hook.
-	 * Uses {@link $_availableHooks} to know which setting is going to be created
 	 * @param array $config_vars Passed by reference, a regular SMF's config_vars array.
 	 * @access public
 	 * @return void
 	 */
 	public function disableHooks(&$config_vars)
 	{
+		$hooks = $this->config('availableHooks');
+
+		// No hooks were found. Nothing to do.
+		if (!$hooks)
+			return false;
+
 		// A title and a description.
 		if ($this->text('disable_hook_title'))
 			$config_vars[] = array('title', 'Ohara_disableHooks_title', 'label' => $this->parser($this->text('disable_hook_title'), array('modname' => $this->name)));
@@ -291,7 +294,8 @@ class Ohara
 		if ($this->text('disable_hook_desc'))
 			$config_vars[] = array('desc', 'Ohara_disableHooks_desc', 'label' => $this->parser($this->text('disable_hook_desc'), array('modname' => $this->name)));
 
-		foreach ($this->_availableHooks as $hook => $hook_name)
+
+		foreach ($hooks as $hook => $hook_name)
 		{
 			// Hook has already been disabled, no point in disabling it again :P
 			if (empty($hook_name))
