@@ -229,17 +229,31 @@ class Ohara
 	{
 		global $context;
 
+		// Get the hooks.
+		$hooks = $this->config('availableHooks');
+		$overwriteHooks = $this->config('overwriteHooks');
+
 		// Don't execute on uninstall.
-		if (!empty($context['uninstalling']) || $this->data('sa') == 'uninstall2')
+		if (!empty($context['uninstalling']) || $this->data('sa') == 'uninstall2' || !$hooks)
 			return;
 
-		foreach ($this->_availableHooks as $hook => $hook_name)
+		foreach ($hooks as $hook => $hook_name)
 		{
 			// The $hook_name value acts as an "enable" check, empty means you do not want to use this hook.
 			if (empty($hook_name))
 				continue;
 
-			$overwriteThis = !empty($this->_overwriteHooks[$hook]) ? $this->_overwriteHooks[$hook] : false;
+			// Gotta replace our tokens.
+			if ($overwriteHooks && !empty($overwriteHooks[$hook]))
+				$overwriteHooks[$hook]['file'] = $this->parser($overwriteHooks[$hook]['file'], array(
+					'$sourcedir' => $this->sourceDir,
+					'$scripturl' => $this->scriptUrl,
+					'$boarddir' => $this->boardDir,
+					'$boardurl' => $this->boardUrl,
+				));
+
+			else
+				$overwriteHooks[$hook] = array();
 
 			// Set some default values.
 			$defaultValues = array(
@@ -251,7 +265,7 @@ class Ohara
 			);
 
 			// You might or might not want to overwrite this...
-			extract(!empty($overwriteThis) ? array_merge($defaultValues, $overwriteThis) : $defaultValues);
+			extract(array_merge($defaultValues, $overwriteHooks[$hook]));
 
 			// You can also disable any hook used by this mod from the mod's admin settings if the mod has that feature.
 			$hookAction = ($this->enable('disable_hook_'. $hook_name) ? 'remove' : 'add') .'_integration_function';
