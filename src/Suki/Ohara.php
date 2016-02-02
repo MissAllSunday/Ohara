@@ -27,56 +27,6 @@ class Ohara
 	public $name = '';
 
 	/**
-	 * A list of hooks and its inner data.
-	 * While {@link $_availableHooks} holds the hook's full name, this property holds the data that will be used on each hook call.
-	 * If a predefined method needs predefined data for the specific hook called, you need to set the requested data on this property using the hook inner name to identify it.
-	 * The "key" is used as a short reference to help identify each hook, the "value" is a mixed var, could be a boolean, a string or an array depending on the hook been called. The "value" acts as an "enable" check, if it contains an non empty var the hook is processed otherwise the value is set to the hook's corresponding type of var on its empty state (false, array(), '').
-	 * Hooks that do not pass any data should be set to a boolean.
-	 * Needs to be defined/extended/modified BEFORE calling {@link getRegistry()}
-	 * @access protected
-	 * @var array
-	 */
-	protected $_modHooks = array(
-		'credits' => false,
-		'actions' => array(),
-		'helpAdmin' => '',
-	);
-
-	/**
-	 * Special property to allow mod authors to overwrite every aspect of hooks called on runtime.
-	 * Contains a list of hooks to be overwritten.
-	 * Each hook contains an array of values, the list is as follows:
-	 * 'hookName' => The hook name, it gets defined by {@link $_availableHooks},
-	 * 'func' => The function that will be called for this hook, by default it uses {@$name} and adds a "add" prefix to the hook identifier, also assumes your function is a method.
-	 * 'permanent' => To let SMF know if this hook will be permanently added to the DB, default is false.
-	 * 'file' => The file to be loaded when this hook is called, useful if you have your function on another file, by default uses {@$name} for the filename and assumes its located on Sources folder.
-	 * 'object' => Boolean param to let SMF know if your function is suppose to be called as an instantiated method or not, only valid if your function is a method.
-	 * Needs to be defined/extended/modified BEFORE calling {@link getRegistry()}
-	 * @access protected
-	 * @var array
-	 */
-	protected $_overwriteHooks = array();
-
-	/**
-	 * An array containing all supported hooks by default.
-	 * The "key" is used as a short reference to help identify each hook, the "value" is the full hook name.
-	 * Mod authors can extend this list and add support for any other hook not listed by default.
-	 * The following hooks are supported by default:
-		'credits' => 'integrate_credits',
-		'actions' => 'integrate_actions',
-		'helpAdmin' => 'integrate_helpadmin',
-	 * @access protected
-	 * @var array
-	 */
-	protected $_availableHooks = array();
-
-	protected $_libNamespace = array();
-
-	protected $_libPSR = array();
-
-	protected $_libClassMap = array();
-
-	/**
 	 * Text array for holding your own text strings
 	 * @access protected
 	 * @var array
@@ -90,6 +40,16 @@ class Ohara
 	 * @var array
 	 */
 	protected static $_registry = array();
+
+	protected static $_config = array();
+
+	/**
+	 * A security check to make sure the mod does want to use a config file.
+	 * @static
+	 * @access protected
+	 * @var boolean
+	 */
+	protected $_useConfig = false;
 
 	/**
 	 * Holds any sanitized data from $_REQUEST
@@ -181,6 +141,9 @@ class Ohara
 
 		static::$_registry[$this->name] = $this;
 
+		// Get this mod's config file.
+		$this->getConfigFile();
+
 		// Any runtime hooks?
 		if ($this->_availableHooks)
 			$this->createHooks();
@@ -195,6 +158,54 @@ class Ohara
 	public function getRegistry($instance = '')
 	{
 		return $instance ? (!empty(static::$_registry[$instance]) ? static::$_registry[$instance] : false) : (!empty(static::$_registry) ? static::$_registry : false);
+	}
+
+	protected function getConfigFile()
+	{
+		global $txt;
+
+		$file = $this->sourceDir .'/_config'. $this->name .'.json';
+
+		// No config file needed.
+		if (!$this->useConfig)
+			return static::$_config[$this->name] = array();
+
+		// Already loaded?
+		if (!empty(static::$_config[$this->name]))
+			return static::$_config[$this->name];
+
+		// Get the json file. Must be located in Sources folder and must be named:
+		if (!file_exists($file))
+		{
+			loadLanguage('Errors');
+			log_error($this->parser($txt['error_bad_file'], array('%1$s' => $file)));
+
+			return static::$_config[$this->name] = array();
+		}
+
+		else
+		{
+			$jsonArray = json_decode(file_get_contents($file), true);
+
+			$result = json_last_error() == JSON_ERROR_NONE;
+
+			// Everything went better than expected!
+			if ($result)
+				return static::$_config[$this->name] = $file;
+
+			else
+			{
+				loadLanguage('Errors');
+				log_error($this->parser($txt['error_bad_file'], array('%1$s' => $file)));
+
+				return static::$_config[$this->name] = array();
+			}
+		}
+	}
+
+	protected function config($name = '')
+	{
+		return $name ? (!empty(static::$_config[$this->name]['_'. $name]) ? static::$_config[$this->name]['_'. $name] : false) : (!empty(static::$_config[$this->name]) ? static::$_config[$this->name] : false);
 	}
 
 	/**
