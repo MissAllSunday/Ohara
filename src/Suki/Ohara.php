@@ -866,7 +866,7 @@ class Ohara
 
 	/**
 	 * Add a set of config vars.
-	 * This is a much smaller approach than addAdminArea, its designed to use the integrate_general_mod_settings and add a very simple set or config vars. Useful for small mods that doesn't have a lot of settings. 
+	 * This is a much smaller approach than addAdminArea, its designed to use the integrate_general_mod_settings and add a very simple set or config vars. Useful for small mods that doesn't have a lot of settings.
 	 * Uses $config['simpleSettings'] to determinate the number of settings to add.
 	 * Mods can still overwrite this method to add more complex settings.
 	 * @access public
@@ -897,6 +897,32 @@ class Ohara
 				else
 					$config_vars[] = array($s['type'], $this->name .'_'. $s['name'], 'subtext' => $this->text($s['name'] .'_sub'));
 			}
+	}
+
+	public function addPermissions(&$permissionGroups, &$permissionList)
+	{
+		// This needs to be set and extended by someone else!
+		$hooks = $this->config('availableHooks');
+
+		if (!$hooks['permissions'])
+			return;
+
+		$customPerm = $this->config('permissions');
+		$identifier = $customPerm['identifier'] ? $customPerm['identifier'] : $this->name;
+		$langFile = $customPerm['langFile'] ? $customPerm['langFile'] : $this->name;
+
+		// We gotta load our language file.
+		loadLanguage($langFile);
+
+		$permissionGroups['membergroup']['simple'] = array($identifier .'_per_simple');
+		$permissionGroups['membergroup']['classic'] = array($identifier .'_per_classic');
+
+		if (!empty($customPerm['perms']) && is_array($customPerm['perms']))
+			foreach ($customPerm['perms'] as $p)
+				$permissionList['membergroup'][$identifier .'_'. $p] = array(
+				false,
+				$identifier .'_per_classic',
+				$identifier .'_per_simple');
 	}
 
 	/**
