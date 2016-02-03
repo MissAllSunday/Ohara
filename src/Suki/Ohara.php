@@ -865,6 +865,41 @@ class Ohara
 	}
 
 	/**
+	 * Add a set of config vars.
+	 * This is a much smaller approach than addAdminArea, its designed to use the integrate_general_mod_settings and add a very simple set or config vars. Useful for small mods that doesn't have a lot of settings. 
+	 * Uses $config['simpleSettings'] to determinate the number of settings to add.
+	 * Mods can still overwrite this method to add more complex settings.
+	 * @access public
+	 * @return void
+	 */
+	public function addSimpleSettings(&$config_vars)
+	{
+		// This needs to be set and extended by someone else!
+		$hooks = $this->config('availableHooks');
+
+		if (!$hooks['simpleSettings'])
+			return;
+
+		$sSettings = $this->config('simpleSettings');
+
+		if (!empty($sSettings) && is_array($sSettings))
+			foreach ($sSettings as $s)
+			{
+				// Empty value means adding an "HR" tag.
+				if (empty($s))
+					$config_vars[] = '';
+
+				// A string value means a "title".
+				elseif (is_string($s))
+					$config_vars[] = $this->text($s);
+
+				// The rest.
+				else
+					$config_vars[] = array($s['type'], $this->name .'_'. $s['name'], 'subtext' => $this->text($s['name'] .'_sub'));
+			}
+	}
+
+	/**
 	 * Loads a language file.
 	 * Used to load a language to properly display any help txt strings from mods that adds new permissions via hooks
 	 * Uses {@link $_modHooks} if the mod author wants to specify a custom file name, if not, it defaults to {@link $name}
