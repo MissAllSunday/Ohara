@@ -131,11 +131,10 @@ class Ohara
 	public function setRegistry()
 	{
 		global $sourcedir, $scripturl;
-		global $settings, $boarddir, $boardurl;
+		global $boarddir, $boardurl;
 
 		$this->sourceDir = $sourcedir;
 		$this->scriptUrl = $scripturl;
-		$this->settings = $settings;
 		$this->boardDir = $boarddir;
 		$this->boardUrl = $boardurl;
 
@@ -163,10 +162,10 @@ class Ohara
 	{
 		global $txt;
 
-		$file = $this->sourceDir .'/_config'. $this->name .'.json';
+		$file = $this->boardDir .'/_config'. $this->name .'.json';
 
 		// No config file needed.
-		if (!$this->useConfig)
+		if (!$this->_useConfig)
 			return static::$_config[$this->name] = array();
 
 		// Already loaded?
@@ -190,7 +189,7 @@ class Ohara
 
 			// Everything went better than expected!
 			if ($result)
-				return static::$_config[$this->name] = $file;
+				return static::$_config[$this->name] = $jsonArray;
 
 			else
 			{
@@ -825,7 +824,7 @@ class Ohara
 
 		$areas['config']['areas'][$this->name] = array(
 			'label' => !empty($customArea['label']) ? $customArea['label'] : $this->text('modName'),
-			'file' => !empty($customArea['file']) ? $customArea['file'] : $this->name .'Admin.php',
+			'file' => !empty($customArea['file']) ? $customArea['file'] : $this->name .'.php',
 			'function' => !empty($customArea['function']) ? $customArea['function'] : $this->name .'::addAdminCall#',
 			'icon' => !empty($customArea['icon']) ? $customArea['icon'] : 'posts',
 			'subsections' => array_merge(array(
@@ -856,12 +855,13 @@ class Ohara
 		// Load some stuff.
 		loadGeneralSettingParameters($subSections, 'settings');
 
-		// Does the subsection exists? defaults to "settings".
-		$this->_sa = isset($subSections[$this->data('sa')]) ? $subSections[$this->data('sa')] : 'settings';
+		// Does the subsection exists? defaults to "settings". the "add" bit is to prevent methods been mixed up.
+		$this->_sa = isset($subSections[$this->data('sa')]) ? $this->data('sa') : 'settings';
+		$call = 'add'. ucfirst($this->_sa);
 
 		// Yep, heres a valid example of a parent class having to call a child's method.
-		if(method_exists($this, $this->_sa))
-			$this->{$this->_sa}();
+		if(method_exists($this, $call))
+			$this->{$call}();
 	}
 
 	/**
