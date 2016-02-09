@@ -820,7 +820,24 @@ class Ohara
 		$customArea = $this->config('adminArea');
 
 		// Custom settings?
-		$subSections = $this->config('adminSubsections') ? $this->config('adminSubsections') : array();
+		$this->_adminSubSections = $this->config('adminSubsections') ? $this->config('adminSubsections') : array();
+
+		// Get the correct text setting. and vreplace any variable tokens.
+		if ($this->_adminSubSections)
+			foreach ($this->_adminSubSections as $k)
+			{
+				// The first key is ALWAYS the text string, config files cannot add full text strings but they can add text keys so we use that.
+				$subSections[$k][0] = $this->text($subSections[$k]['name']);
+
+				// Custom url? replace the tokens.
+				if (!empty($k['url'])
+					$subSections[$k]['url'] = $this->parser($subSections[$k]['url'], array(
+						'$sourcedir' => $this->sourceDir,
+						'$scripturl' => $this->scriptUrl,
+						'$boarddir' => $this->boardDir,
+						'$boardurl' => $this->boardUrl,
+					));
+			}
 
 		$areas['config']['areas'][$this->name] = array(
 			'label' => !empty($customArea['label']) ? $customArea['label'] : $this->text('modName'),
@@ -829,7 +846,7 @@ class Ohara
 			'icon' => !empty($customArea['icon']) ? $customArea['icon'] : 'posts',
 			'subsections' => array_merge(array(
 				'settings' => array($this->text('modName')),
-			), $subSections),
+			), $this->_adminSubSections),
 		);
 	}
 
@@ -847,21 +864,20 @@ class Ohara
 
 		$context['page_title'] = $this->text('modName');
 
-		// Add or overwrite the default subsection.
-		$subSections = array_merge(array(
-			'settings' => array($this->text('modName')),
-		), ($this->config('adminSubsections') ? array_keys($this->config('adminSubsections')) : array()));
-
 		// Load some stuff.
-		loadGeneralSettingParameters($subSections, 'settings');
+		loadGeneralSettingParameters($this->_adminSubSections, 'settings');
 
 		// Does the subsection exists? defaults to "settings". the "add" bit is to prevent methods been mixed up.
-		$this->_sa = isset($subSections[$this->data('sa')]) ? $this->data('sa') : 'settings';
+		$this->_sa = isset($this->_adminSubSections[$this->data('sa')]) ? $this->data('sa') : 'settings';
 		$call = 'add'. ucfirst($this->_sa);
 
 		// Yep, heres a valid example of a parent class having to call a child's method.
 		if(method_exists($this, $call))
 			$this->{$call}();
+
+		// Get lost.
+		else
+			return redirectexit();
 	}
 
 	/**
