@@ -48,3 +48,4 @@ Thumbs.db
 /test.php
 /vendor/
 /.git/
+/phpunit.xml
