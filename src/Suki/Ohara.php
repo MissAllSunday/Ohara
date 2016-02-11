@@ -545,11 +545,10 @@ class Ohara
 		if (empty($key))
 			return false;
 
-		$update =  !empty($_SESSION[$this->name][$key]) ? $_SESSION[$this->name][$key] : false;
+		$update =  !empty($_SESSION[$this->name]['update'][$key]) ? $_SESSION[$this->name]['update'][$key] : false;
 
 		if (!empty($update))
-			foreach ($update as $key => $m)
-				$this->cleanUpdate($key);
+			$this->cleanUpdate($key);
 
 		return $update;
 	}
@@ -564,25 +563,26 @@ class Ohara
 	{
 		$update =  !empty($_SESSION[$this->name]['update']) ? $_SESSION[$this->name]['update'] : false;
 
-		if (!empty($update))
-			foreach ($update as $k => $v)
-				$this->cleanUpdate($k);
+		// Clean em all!
+		$this->cleanUpdate();
 
 		return $update;
 	}
 
 	/**
-	 * Deletes the key form $_SESSION
+	 * Deletes the key from $_SESSION
 	 * automatically called by any getter after retrieving the needed message.
-	 * @param string $key The unique identifier for your message
+	 * @param string $key The unique identifier for your message. No key means all messages will be cleaned.
 	 * @access public
 	 */
-	public function cleanUpdate($key)
+	public function cleanUpdate($key = false)
 	{
+		// No key means you want to clean em all.
 		if (empty($key))
-			return false;
+			unset($_SESSION[$this->name]['update']);
 
-		unset($_SESSION[$this->name]['update'][$key]);
+		else
+			unset($_SESSION[$this->name]['update'][$key]);
 	}
 
 	/**
@@ -694,7 +694,7 @@ class Ohara
 	 * @access public
 	 * @param string $string The string to check and format
 	 * @param string $type The type to check against. Accepts "numeric", "alpha" and "alphanumeric".
-	 * @param string $delimiter Used for explode7imploding the string.
+	 * @param string $delimiter Used for explode/imploding the string.
 	 * @return string|bool
 	 */
 	public function commaSeparated($string, $type = 'alphanumeric', $delimiter = ',')
@@ -717,9 +717,9 @@ class Ohara
 		return empty($string) ? false : implode($delimiter, array_filter(explode($delimiter, preg_replace(
 			array(
 				'/[^'. $t .',]/',
-				'/(?<=,),+/',
-				'/^,+/',
-				'/,+$/'
+				'/(?<='. $delimiter .')'. $delimiter .'+/',
+				'/^'. $delimiter .'+/',
+				'/'. $delimiter .'+$/'
 			), '', $string
 		))));
 	}
@@ -800,84 +800,6 @@ class Ohara
 			return;
 
 		$context['copyrights']['mods'][] = is_string($hooks['credits']) ? $this->text($hooks['credits']) : $this->text('modCredits');
-	}
-
-	/**
-	 * Creates an entire new admin setting.
-	 * By default calls a file named $this->name .'Admin.php' this is because if a mod adds an entire admin page, it prob will have a few subsections and as such, a new file is needed.
-	 * @access public
-	 * @param array $areas The entire SMF area array passed by reference.
-	 * @return void
-	 */
-	public function addAdminArea(&$areas)
-	{
-		// This needs to be set and extended by someone else!
-		$hooks = $this->config('availableHooks');
-
-		if (!$hooks['adminArea'])
-			return;
-
-		$customArea = $this->config('adminArea');
-
-		// Custom settings?
-		$this->_adminSubSections = $this->config('adminSubsections') ? $this->config('adminSubsections') : array();
-
-		// Get the correct text setting. and vreplace any variable tokens.
-		if ($this->_adminSubSections)
-			foreach ($this->_adminSubSections as $k)
-			{
-				// The first key is ALWAYS the text string, config files cannot add full text strings but they can add text keys so we use that.
-				$subSections[$k][0] = $this->text($subSections[$k]['name']);
-
-				// Custom url? replace the tokens.
-				if (!empty($k['url'])
-					$subSections[$k]['url'] = $this->parser($subSections[$k]['url'], array(
-						'$sourcedir' => $this->sourceDir,
-						'$scripturl' => $this->scriptUrl,
-						'$boarddir' => $this->boardDir,
-						'$boardurl' => $this->boardUrl,
-					));
-			}
-
-		$areas['config']['areas'][$this->name] = array(
-			'label' => !empty($customArea['label']) ? $customArea['label'] : $this->text('modName'),
-			'file' => !empty($customArea['file']) ? $customArea['file'] : $this->name .'.php',
-			'function' => !empty($customArea['function']) ? $customArea['function'] : $this->name .'::addAdminCall#',
-			'icon' => !empty($customArea['icon']) ? $customArea['icon'] : 'posts',
-			'subsections' => array_merge(array(
-				'settings' => array($this->text('modName')),
-			), $this->_adminSubSections),
-		);
-	}
-
-	/**
-	 * A dispatcher method.
-	 * Uses $config['adminSubsections'] to determinate which subaction needs to be called.
-	 * @access public
-	 * @return void
-	 */
-	public function addAdminCall()
-	{
-		global $context;
-
-		require_once($this->sourceDir . '/ManageSettings.php');
-
-		$context['page_title'] = $this->text('modName');
-
-		// Load some stuff.
-		loadGeneralSettingParameters($this->_adminSubSections, 'settings');
-
-		// Does the subsection exists? defaults to "settings". the "add" bit is to prevent methods been mixed up.
-		$this->_sa = isset($this->_adminSubSections[$this->data('sa')]) ? $this->data('sa') : 'settings';
-		$call = 'add'. ucfirst($this->_sa);
-
-		// Yep, heres a valid example of a parent class having to call a child's method.
-		if(method_exists($this, $call))
-			$this->{$call}();
-
-		// Get lost.
-		else
-			return redirectexit();
 	}
 
 	/**
