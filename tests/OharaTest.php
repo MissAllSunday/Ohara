@@ -1,6 +1,6 @@
 <?php
 
-require '/src/Suki/Ohara.php';
+use Suki\Ohara;
 
 class OharaDummy extends Suki\Ohara
 {
