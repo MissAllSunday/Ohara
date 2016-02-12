@@ -1,4 +1,4 @@
-Ohara
+Ohara  [![Build Status](https://travis-ci.org/MissAllSunday/Ohara.svg?branch=master)](https://travis-ci.org/MissAllSunday/Ohara)
 =====
 
 A helper class to be used by SMF modifications (Mods).
