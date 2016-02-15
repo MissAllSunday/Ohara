@@ -2,9 +2,9 @@
 
 /**
  * @package Ohara helper class
- * @version 1.0
+ * @version 1.0.5
  * @author Jessica González <suki@missallsunday.com>
- * @copyright Copyright (c) 2014, Jessica González
+ * @copyright Copyright (c) 2016, Jessica González
  * @license http://www.mozilla.org/MPL/2.0/
  */
 
@@ -70,6 +70,11 @@ class Ohara
 		return $this->name;
 	}
 
+	/**
+	 * Gets any valid config library vars and setup an autoloader for them.
+	 * @access public
+	 * @return void
+	 */
 	public function autoLoad($force = false)
 	{
 		if (null !== self::$loader && !$force)
@@ -158,6 +163,11 @@ class Ohara
 		return $instance ? (!empty(static::$_registry[$instance]) ? static::$_registry[$instance] : false) : (!empty(static::$_registry) ? static::$_registry : false);
 	}
 
+	/**
+	 * Gets a mod's config file, loads it and store it on {@link $_config}
+	 * @access public
+	 * @return array
+	 */
 	protected function getConfigFile()
 	{
 		global $txt;
@@ -201,6 +211,12 @@ class Ohara
 		}
 	}
 
+	/**
+	 * Gets a specific mod config array.
+	 * @access public
+	 * @param string $name The name of an specific setting, if empty it will return the entire array.
+	 * @return mixed
+	 */
 	protected function config($name = '')
 	{
 		return $name ? (!empty(static::$_config[$this->name]['_'. $name]) ? static::$_config[$this->name]['_'. $name] : false) : (!empty(static::$_config[$this->name]) ? static::$_config[$this->name] : false);
@@ -743,7 +759,7 @@ class Ohara
 
 	/**
 	 * Creates a new SMF action.
-	 * Uses {@link $_modHooks} to determinate the name and file for the action, if no data is given, {@link $name} will be used
+	 * Uses config('actions') to determinate the name and file for the action, if no data is given, {@link $name} will be used
 	 * @access public
 	 * @param array $actions An array containing all current registered SMF actions at the moment of this method execution
 	 * @return void
