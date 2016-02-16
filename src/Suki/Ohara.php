@@ -186,7 +186,7 @@ class Ohara
 		if (!file_exists($file))
 		{
 			loadLanguage('Errors');
-			log_error($this->parser($txt['error_bad_file'], array('%1$s' => $file)));
+			log_error(sprintf($txt['error_bad_file'], $file));
 
 			return static::$_config[$this->name] = array();
 		}
@@ -204,7 +204,7 @@ class Ohara
 			else
 			{
 				loadLanguage('Errors');
-				log_error($this->parser($txt['error_bad_file'], array('%1$s' => $file)));
+				log_error(sprintf($txt['error_bad_file'], $file));
 
 				return static::$_config[$this->name] = array();
 			}
@@ -471,7 +471,11 @@ class Ohara
 		if (empty($this->_request))
 			$this->setData();
 
-		return $this->validate($var) ? $this->sanitize($this->_request[$var]) : false;
+		$r = $this->validate($var) ? $this->sanitize($this->_request[$var]) : false;
+
+		unset($this->_request);
+
+		return $r;
 	}
 
 	/**
