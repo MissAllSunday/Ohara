@@ -14,7 +14,7 @@ class Tools
 {
 	public function __construct($app)
 	{
-		$this->app = $app;
+		$this->_app = $app;
 	}
 
 	/**

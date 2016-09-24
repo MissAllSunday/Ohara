@@ -12,4 +12,5 @@ namespace Suki;
 
 class Form
 {
+
 }

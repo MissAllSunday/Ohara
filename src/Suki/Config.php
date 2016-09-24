@@ -13,10 +13,11 @@ namespace Suki;
 class Config
 {
 	protected static $_config = array();
+	protected $_app;
 
 	public function __construct($app)
 	{
-		$this->app = $app;
+		$this->_app = $app;
 	}
 
 	/**
@@ -29,19 +30,19 @@ class Config
 	{
 		global $txt, $modSetting;
 
-		$file = $this->app->boardDir .'/_config'. $this->app->name .'.json';
+		$file = $this->_app->boardDir .'/_config'. $this->_app->name .'.json';
 
 		// No config info needed.
-		if (!$this->app->_useConfig)
-			return static::$_config[$this->app->name] = array();
+		if (!$this->_app->_useConfig)
+			return static::$_config[$this->_app->name] = array();
 
 		// Already loaded?
-		if (!empty(static::$_config[$this->app->name]))
-			return static::$_config[$this->app->name];
+		if (!empty(static::$_config[$this->_app->name]))
+			return static::$_config[$this->_app->name];
 
 		// Check for a $modSetting key first.
-		if (!empty($modSetting['_config'. $this->app->name]))
-			return static::$_config[$this->app->name] = smf_json_decode($modSetting['_config'. $this->app->name], true);
+		if (!empty($modSetting['_config'. $this->_app->name]))
+			return static::$_config[$this->_app->name] = smf_json_decode($modSetting['_config'. $this->_app->name], true);
 
 		// Get the json file. Must be located in $boarddir folder.
 		if (!file_exists($file))
@@ -49,11 +50,11 @@ class Config
 			loadLanguage('Errors');
 			log_error(sprintf($txt['error_bad_file'], $file));
 
-			return static::$_config[$this->app->name] = array();
+			return static::$_config[$this->_app->name] = array();
 		}
 
 		else
-			return static::$_config[$this->app->name] = smf_json_decode(file_get_contents($file), true);
+			return static::$_config[$this->_app->name] = smf_json_decode(file_get_contents($file), true);
 	}
 
 	/**
@@ -64,6 +65,6 @@ class Config
 	 */
 	protected function get($name = '')
 	{
-		return $name ? (!empty(static::$_config[$this->app->name]['_'. $name]) ? static::$_config[$this->app->name]['_'. $name] : false) : (!empty(static::$_config[$this->app->name]) ? static::$_config[$this->app->name] : false);
+		return $name ? (!empty(static::$_config[$this->_app->name]['_'. $name]) ? static::$_config[$this->_app->name]['_'. $name] : false) : (!empty(static::$_config[$this->_app->name]) ? static::$_config[$this->_app->name] : false);
 	}
 }
