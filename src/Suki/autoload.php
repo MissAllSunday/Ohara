@@ -43,7 +43,10 @@ class OharaAutoload
 		);
 
 		// Gotta register our main class.
-		$pref['namespaces']['Suki'] = array($sourcedir . '/ohara/src'),
+		$pref['namespaces']['Suki'] = array($sourcedir . '/ohara/src');
+
+		// And Pimple too.
+		$pref['namespaces']['Composer\\Installers\\'] => array($vendorDir . '/composer/installers/src'),
 
 		if (!empty($pref['namespaces']))
 			foreach ($pref['namespaces'] as $namespace => $path)
@@ -64,11 +67,10 @@ class OharaAutoload
 		if (!empty($pref['classmap']))
 			foreach ($pref['classmap'] as $name => $classMap)
 			{
-				$that = $__CLASS__;
 				$classMap = (array) $classMap;
-				$classMap = array_map(function($map) use ($that, $replacements) { return $that::parser($map, $replacements); }, $classMap);
-				$path[0] = $this::parser($path[0], $replacements);
-				$loader->addClassMap($this::parser($classMap, $replacements));
+				$classMap = array_map(function($map) use ($that, $replacements) { return self::parser($map, $replacements); }, $classMap);
+				$path[0] = self::parser($path[0], $replacements);
+				$loader->addClassMap(self::parser($classMap, $replacements));
 				unset($that);
 			}
 
@@ -95,3 +97,5 @@ class OharaAutoload
 		return str_replace($find, $replace, $text);
 	}
 }
+
+return OharaAutoload::getLoader();

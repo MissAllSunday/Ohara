@@ -37,14 +37,6 @@ class Ohara extends Pimple\Container
 	protected $_text = array();
 
 	/**
-	 * An array holding up all instances extending Ohara
-	 * @static
-	 * @access protected
-	 * @var array
-	 */
-	protected static $_registry = array();
-
-	/**
 	 * A security check to make sure the mod does want to use a config file.
 	 * @static
 	 * @access protected
@@ -68,13 +60,12 @@ class Ohara extends Pimple\Container
 	protected function set()
 	{
 		foreach($this->_services as $s)
-		{
 			$this[$s] = function ($c) use ($s)
 			{
-				$call = ucfirst($s);
+				// Build the  right namespace.
+				$call = __NAMESPACE__ .'\\'. ucfirst($s);
 				return new $call($c);
 			};
-		}
 	}
 
 	/**
@@ -160,7 +151,7 @@ class Ohara extends Pimple\Container
 		$this->boardDir = $boarddir;
 		$this->boardUrl = $boardurl;
 
-		static::$_registry[$this->name] = $this;
+		$this->set();
 
 		// Get this mod's config file.
 		$this->getConfigFile();

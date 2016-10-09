@@ -132,7 +132,7 @@ class Data
 			return false;
 
 		// Store it! or overwrite it!
-		$_SESSION[$this->name]['update'][$key] = $message;
+		$_SESSION[$this->name]['update'][$key] = $this->sanitize($message);
 	}
 
 	/**
