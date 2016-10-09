@@ -21,7 +21,7 @@ class OharaTest extends \PHPUnit_Framework_TestCase
 	{
 		$o = new OharaDummy;
 
-		$result = $o->commaSeparated($originalString, $type);
+		$result = $o['tools']->commaSeparated($originalString, $type);
 
 		$this->assertEquals($expectedResult, $result);
 	}
