@@ -11,9 +11,6 @@
 namespace Suki;
 use Pimple\Container;
 
-// Awful, I know.
-require_once $sourcedir . '/Breeze/Pimple/Container.php';
-
 /**
  * Helper class for SMF modifications
  * @package Ohara helper class
@@ -79,62 +76,6 @@ class Ohara extends Pimple\Container
 	}
 
 	/**
-	 * Gets any valid config library vars and setup an autoloader for them.
-	 * @access public
-	 * @return void
-	 */
-	public function autoLoad($force = false)
-	{
-		if (null !== self::$loader && !$force)
-			return self::$loader;
-
-		// Yep, manually loaded...
-		require_once ($this->sourceDir .'/ohara/src/Suki/ClassLoader.php');
-
-		// Define some of the most commonly used dirs.
-		$vendorDir = $this->boardDir .'/vendor';
-		$baseDir = dirname($vendorDir);
-		self::$loader = $loader = new ClassLoader();
-		$replacements = array(
-			'$vendorDir' => $vendorDir,
-			'$baseDir' => $baseDir,
-			'$boarddir' => $this->boardDir,
-			'$sourcedir' => $this->sourceDir,
-		);
-
-		if ($this->config('libNamespace'))
-			foreach ($this->config('libNamespace') as $namespace => $path)
-			{
-				$path = (array) $path;
-				$path[0] = $this->parser($path[0], $replacements);
-				$loader->set($namespace, $path);
-			}
-
-		if ($this->config('libPSR'))
-			foreach ($this->config('libPSR') as $namespace => $path)
-			{
-				$path = (array) $path;
-				$path[0] = $this->parser($path[0], $replacements);
-				$loader->setPsr4($namespace, $this->parser($path, $replacements));
-			}
-
-		if ($this->config('libClassMap'))
-			foreach ($this->config('libClassMap') as $name => $classMap)
-			{
-				$that = $this;
-				$classMap = (array) $classMap;
-				$classMap = array_map(function($map) use ($that, $replacements) { return $that->parser($map, $replacements); }, $classMap);
-				$path[0] = $this->parser($path[0], $replacements);
-				$loader->addClassMap($this->parser($classMap, $replacements));
-				unset($that);
-			}
-
-		$loader->register(true);
-
-		return $loader;
-	}
-
-	/**
 	 * Registers your function on {@link $_registry} and sets many properties replacing SMF's global vars
 	 * Needs to be called by any class extending this class, preferable on a __construct method but can be called when/where necessary.
 	 * Calls {@link createHooks()} if there is any runtime hook.
@@ -151,10 +92,11 @@ class Ohara extends Pimple\Container
 		$this->boardDir = $boarddir;
 		$this->boardUrl = $boardurl;
 
+		// Create the services.
 		$this->set();
 
 		// Get this mod's config file.
-		$this->getConfigFile();
+		$this['config']->getConfig();
 
 		// Any runtime hooks?
 		$this->createHooks();
@@ -191,8 +133,8 @@ class Ohara extends Pimple\Container
 		global $context;
 
 		// Get the hooks.
-		$hooks = $this->config('availableHooks');
-		$overwriteHooks = $this->config('overwriteHooks');
+		$hooks = $this['config']->get('availableHooks');
+		$overwriteHooks = $this['config']->get('overwriteHooks');
 
 		// Don't execute on uninstall.
 		if (!empty($context['uninstalling']) || $this->data('sa') == 'uninstall2' || !$hooks)
@@ -244,7 +186,7 @@ class Ohara extends Pimple\Container
 	 */
 	public function disableHooks(&$config_vars)
 	{
-		$hooks = $this->config('availableHooks');
+		$hooks = $this['config']->get('availableHooks');
 
 		// No hooks were found. Nothing to do.
 		if (!$hooks)
@@ -401,8 +343,8 @@ class Ohara extends Pimple\Container
 	public function addActions(&$actions)
 	{
 		// This needs to be set and extended by someone else!
-		$hooks = $this->config('availableHooks');
-		$oActions = $this->config('actions');
+		$hooks = $this['config']->get('availableHooks');
+		$oActions = $this['config']->get('actions');
 		$counter = 0;
 
 		if (empty($hooks['actions']))
@@ -444,7 +386,7 @@ class Ohara extends Pimple\Container
 		global $context;
 
 		// This needs to be set and extended by someone else!
-		$hooks = $this->config('availableHooks');
+		$hooks = $this['config']->get('availableHooks');
 
 		if (!$hooks['credits'])
 			return;
@@ -463,12 +405,12 @@ class Ohara extends Pimple\Container
 	public function addSimpleSettings(&$config_vars)
 	{
 		// This needs to be set and extended by someone else!
-		$hooks = $this->config('availableHooks');
+		$hooks = $this['config']->get('availableHooks');
 
 		if (!$hooks['simpleSettings'])
 			return;
 
-		$sSettings = $this->config('simpleSettings');
+		$sSettings = $this['config']->get('simpleSettings');
 
 		if (!empty($sSettings) && is_array($sSettings))
 			foreach ($sSettings as $s)
@@ -490,12 +432,12 @@ class Ohara extends Pimple\Container
 	public function addPermissions(&$permissionGroups, &$permissionList)
 	{
 		// This needs to be set and extended by someone else!
-		$hooks = $this->config('availableHooks');
+		$hooks = $this['config']->get('availableHooks');
 
 		if (!$hooks['permissions'])
 			return;
 
-		$customPerm = $this->config('permissions');
+		$customPerm = $this['config']->get('permissions');
 		$identifier = $customPerm['identifier'] ? $customPerm['identifier'] : $this->name;
 		$langFile = $customPerm['langFile'] ? $customPerm['langFile'] : $this->name;
 
@@ -523,7 +465,7 @@ class Ohara extends Pimple\Container
 	public function addHelpAdmin()
 	{
 		// This needs to be set and extended by someone else!
-		$hooks = $this->config('availableHooks');
+		$hooks = $this['config']->get('availableHooks');
 
 		if (!$hooks['helpAdmin'])
 			return;

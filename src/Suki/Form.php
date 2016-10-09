@@ -133,10 +133,10 @@ class Form
 		return $this->addElement($param);
 	}
 
-	public function addHr()
+	public function addHr($custom = '')
 	{
 		$param['type'] = 'hr';
-		$param['html'] = '<br /><hr /><br />';
+		$param['html'] = $custom ? $custom : '<br /><hr /><br />';
 
 		return $this->addElement($param);
 	}

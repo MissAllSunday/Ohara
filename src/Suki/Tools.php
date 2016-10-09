@@ -161,13 +161,14 @@ class Tools
 	 * @access public
 	 * @param string|int  $bytes A number of bytes.
 	 * @param bool $showUnits To show the unit symbol or not.
+	 * @param int  $log the log used, either 1024 or 1000.
 	 * @return string
 	 */
-	public function formatBytes($bytes, $showUnits = false)
+	public function formatBytes($bytes, $showUnits = false, $log = 1024)
 	{
 		$units = array('B', 'KB', 'MB', 'GB', 'TB');
 		$bytes = max($bytes, 0);
-		$pow = floor(($bytes ? log($bytes) : 0) / log(1024));
+		$pow = floor(($bytes ? log($bytes) : 0) / log($log));
 		$pow = min($pow, count($units) - 1);
 		$bytes /= (1 << (10 * $pow));
 		return round($bytes, 4) . ($showUnits ? ' ' . $units[$pow] : '');
