@@ -73,7 +73,7 @@ class Tools
 			// Kill anything else
 			ob_end_clean();
 
-			if ($this->modSetting('CompressedOutput'))
+			if ($this->_app->modSetting('CompressedOutput'))
 				@ob_start('ob_gzhandler');
 
 			else
