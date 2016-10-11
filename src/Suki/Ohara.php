@@ -33,6 +33,8 @@ class Ohara extends \Pimple\Container
 	 */
 	public $text = array();
 
+	public $useConfig = false;
+
 	protected static $loader;
 
 	protected $_services = array(

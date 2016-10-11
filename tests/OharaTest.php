@@ -2,9 +2,15 @@
 
 use Suki\Ohara;
 
-class OharaDummy extends Suki\Ohara
+class OharaDummy extends \Suki\Ohara
 {
 	public $name = 'Dummy';
+	public $useConfig = false;
+
+	public function __construct()
+	{
+		$this->setRegistry();
+	}
 }
 
 class OharaTest extends \PHPUnit_Framework_TestCase

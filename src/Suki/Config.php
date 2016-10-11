@@ -32,7 +32,8 @@ class Config
 
 		$file = $this->_app->boardDir .'/_config'. $this->_app->name .'.json';
 
-		static::$_config[$this->_app->name] = array();
+		if (!$this->_app->useConfig)
+			return static::$_config[$this->_app->name] = array();
 
 		// Already loaded?
 		if (!empty(static::$_config[$this->_app->name]))
@@ -40,7 +41,7 @@ class Config
 
 		// Check for a $modSetting key first.
 		if (!empty($modSetting['_config'. $this->_app->name]))
-			static::$_config[$this->_app->name] = smf_json_decode($modSetting['_config'. $this->_app->name], true);
+			return static::$_config[$this->_app->name] = smf_json_decode($modSetting['_config'. $this->_app->name], true);
 
 		// Get the json file. Must be located in $boarddir folder.
 		if (!file_exists($file))
@@ -48,13 +49,11 @@ class Config
 			loadLanguage('Errors');
 			log_error(sprintf($txt['error_bad_file'], $file));
 
-			static::$_config[$this->_app->name] = array();
+			return static::$_config[$this->_app->name] = array();
 		}
 
 		else
-			static::$_config[$this->_app->name] = smf_json_decode(file_get_contents($file), true);
-
-		return static::$_config[$this->_app->name];
+			return static::$_config[$this->_app->name] = smf_json_decode(file_get_contents($file), true);
 	}
 
 	/**
