@@ -47,7 +47,7 @@ class Data
 	 * @access public
 	 * @return mixed
 	 */
-	public function data($var)
+	public function get($var)
 	{
 		// Forgot something?
 		if (empty($this->_request))

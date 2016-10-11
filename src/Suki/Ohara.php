@@ -16,7 +16,7 @@ use Pimple\Container;
  * @package Ohara helper class
  * @subpackage classes
  */
-class Ohara extends Pimple\Container
+class Ohara extends \Pimple\Container
 {
 	/**
 	 * The main identifier for the class extending Ohara, needs to be re-defined by each extending class
@@ -31,15 +31,7 @@ class Ohara extends Pimple\Container
 	 * @access protected
 	 * @var array
 	 */
-	protected $_text = array();
-
-	/**
-	 * A security check to make sure the mod does want to use a config file.
-	 * @static
-	 * @access protected
-	 * @var boolean
-	 */
-	protected $_useConfig = false;
+	public $text = array();
 
 	protected static $loader;
 
@@ -48,10 +40,7 @@ class Ohara extends Pimple\Container
 		'form',
 		'config',
 		'loader',
-	);
-
-	protected $_extServices = array(
-		'classLoader' => 'Composer\Autoload',
+		'data',
 	);
 
 	protected function set()
@@ -137,7 +126,7 @@ class Ohara extends Pimple\Container
 		$overwriteHooks = $this['config']->get('overwriteHooks');
 
 		// Don't execute on uninstall.
-		if (!empty($context['uninstalling']) || $this->data('sa') == 'uninstall2' || !$hooks)
+		if (!empty($context['uninstalling']) || $this['data']->get('sa') == 'uninstall2' || !$hooks)
 			return;
 
 		foreach ($hooks as $hook => $hook_name)

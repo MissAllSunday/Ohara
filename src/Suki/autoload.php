@@ -1,5 +1,7 @@
 <?php
 
+namespace Suki;
+
 class OharaAutoload
 {
 	private static $loader;
@@ -20,14 +22,14 @@ class OharaAutoload
 		if (null !== self::$loader)
 			return self::$loader;
 
-		spl_autoload_register(array('OharaAutoload', 'loadClassLoader'), true, true);
+		spl_autoload_register(array('\Suki\OharaAutoload', 'loadClassLoader'), true, true);
 		self::$loader = $loader = new \Composer\Autoload\ClassLoader();
-		spl_autoload_unregister(array('OharaAutoload', 'loadClassLoader'));
+		spl_autoload_unregister(array('\Suki\OharaAutoload', 'loadClassLoader'));
 
 		// Define some of the most commonly used dirs.
 		$vendorDir = $boarddir .'/vendor';
 		$baseDir = dirname($vendorDir);
-		self::$loader = $loader = new ClassLoader();
+		self::$loader = $loader = new \Composer\Autoload\ClassLoader();
 		$replacements = array(
 			'$vendorDir' => $vendorDir,
 			'$baseDir' => $baseDir,
@@ -46,30 +48,21 @@ class OharaAutoload
 		$pref['namespaces']['Suki'] = array($sourcedir . '/ohara/src');
 
 		// And Pimple too.
-		$pref['namespaces']['Composer\\Installers\\'] => array($vendorDir . '/composer/installers/src'),
+		$pref['namespaces']['Pimple'] = ($vendorDir . '/pimple/pimple/src');
 
 		if (!empty($pref['namespaces']))
 			foreach ($pref['namespaces'] as $namespace => $path)
-			{
-				$path = (array) $path;
-				$path[0] = self::parser($path[0], $replacements);
-				$loader->set($namespace, $path);
-			}
+				$loader->set($namespace, self::parser($path, $replacements));
 
 		if (!empty($pref['psr4']))
 			foreach ($pref['psr4'] as $namespace => $path)
-			{
-				$path = (array) $path;
-				$path[0] = self::parser($path[0], $replacements);
 				$loader->setPsr4($namespace, self::parser($path, $replacements));
-			}
 
 		if (!empty($pref['classmap']))
 			foreach ($pref['classmap'] as $name => $classMap)
 			{
 				$classMap = (array) $classMap;
-				$classMap = array_map(function($map) use ($that, $replacements) { return self::parser($map, $replacements); }, $classMap);
-				$path[0] = self::parser($path[0], $replacements);
+				$classMap = array_map(function($map) use ($replacements) { return OharaAutoload::parser($map, $replacements); }, $classMap);
 				$loader->addClassMap(self::parser($classMap, $replacements));
 				unset($that);
 			}
