@@ -66,4 +66,34 @@ class Config
 	{
 		return $name ? (!empty(static::$_config[$this->_app->name]['_'. $name]) ? static::$_config[$this->_app->name]['_'. $name] : false) : (!empty(static::$_config[$this->_app->name]) ? static::$_config[$this->_app->name] : false);
 	}
+
+	/**
+	 * Insert/Updates a mod config value.
+	 * @access public
+	 * @param array $values an array of values to be inserted, it follows a name => value format
+	 * @param string $instanceName The name of the instance, if empty, $this->_app->name will be used.
+	 * @return array the full modified config array. An empty array if the process couldn't be performed.
+	 */
+	public function put($values = array(), $instanceName = '')
+	{
+		// The usual checks.
+		if (empty($values))
+			return array();
+
+		// Work with arrays.
+		$values = (array) $values;
+
+		// Custom instance?
+		$instanceName = !empty($instanceName) ? $instanceName : $this->_app->name;
+
+		// Does it exists?
+		if (empty(static::$_config[$instanceName]))
+			return array();
+
+		// Perform. Overwrite the values.
+		static::$_config[$instanceName] = array_merge(static::$_config[$instanceName], $values);
+
+		// Done!
+		return static::$_config[$instanceName];
+	}
 }
