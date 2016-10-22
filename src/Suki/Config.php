@@ -22,13 +22,13 @@ class Config
 
 	/**
 	 * Gets a mod's config settings, loads it and store it on {@link $_config}
-	 * Checks if a $modSetting key exists and tries to load the info from it, defaults to check for a json file.
+	 * Checks if a $modSettings key exists and tries to load the info from it, defaults to check for a json file.
 	 * @access public
 	 * @return array
 	 */
 	public function getConfig()
 	{
-		global $txt, $modSetting;
+		global $txt, $modSettings;
 
 		$file = $this->_app->boardDir .'/_config'. $this->_app->name .'.json';
 
@@ -39,9 +39,9 @@ class Config
 		if (!empty(static::$_config[$this->_app->name]))
 			return static::$_config[$this->_app->name];
 
-		// Check for a $modSetting key first.
-		if (!empty($modSetting['_config'. $this->_app->name]))
-			return static::$_config[$this->_app->name] = smf_json_decode($modSetting['_config'. $this->_app->name], true);
+		// Check for a $modSettings key first.
+		if (!empty($modSettings['_config'. $this->_app->name]))
+			return static::$_config[$this->_app->name] = smf_json_decode($modSettings['_config'. $this->_app->name], true);
 
 		// Get the json file. Must be located in $boarddir folder.
 		if (!file_exists($file))

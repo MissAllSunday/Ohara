@@ -39,9 +39,9 @@ class OharaAutoload
 
 		// Get all mod's autoload preferences.
 		$pref = !empty($modSettings['OharaAutoload']) ? smf_json_decode($modSettings['OharaAutoload'], true) : array(
-			'namespaces',
-			'psr4',
-			'classmap',
+			'namespaces' => array(),
+			'psr4' => array(),
+			'classmap' => array(),
 		);
 
 		// Gotta register our main class.
