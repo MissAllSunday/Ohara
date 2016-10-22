@@ -300,6 +300,46 @@ class Ohara extends \Pimple\Container
 	}
 
 	/**
+	 * Returns the actual value of the selected $modSetting
+	 * If no setting exists, the default value is returned.
+	 * This is a shortcut for cases like: $var = !empty($modSettings['foo']) ? $modSettings['foo'] : 'baz';
+	 * @param string $var The name of the $modSetting key you want to retrieve
+	 * @param mixed $default The default value used if the setting doesn't exists.
+	 * @access public
+	 * @return mixed|boolean
+	 */
+	public settingDefault($var, $default)
+	{
+		global $modSettings;
+
+		// This should be extended by somebody else...
+		if (empty($this->name) || empty($var) || is_null($default))
+			return false;
+
+		return !empty($modSettings[$this->name .'_'. $var]) ? $modSettings[$this->name .'_'. $var] : $default;
+	}
+
+	/**
+	 * Returns the actual value of the selected $modSetting
+	 * If no setting exists, the default value is returned.
+	 * This is a shortcut for cases like: $var = !empty($modSettings['foo']) ? $modSettings['foo'] : 'baz';
+	 * @param string $var The name of the $modSetting key you want to retrieve
+	 * @param mixed $default The default value used if the setting doesn't exists.
+	 * @access public
+	 * @return mixed|boolean
+	 */
+	public modSettingDefault($var, $default)
+	{
+		global $modSettings;
+
+		// This should be extended by somebody else...
+		if (empty($this->name) || empty($var) || is_null($default))
+			return false;
+
+		return !empty($modSettings[$var]) ? $modSettings[$var] : $default;
+	}
+
+	/**
 	 * Returns the actual value of a generic $modSetting var
 	 * useful to check external $modSettings vars
 	 * @param string $var The name of the $modSetting key you want to retrieve
