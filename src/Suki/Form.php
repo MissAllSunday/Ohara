@@ -209,7 +209,7 @@ class Form
 				case 'text':
 					$return .= '
 		<dt>
-			<span style="font-weight:bold;">'. $el['text'] .'</span>
+			<span>'. $el['text'] .'</span>
 			<br /><span class="smalltext">'. $el['desc'] .'</span>
 		</dt>
 		<dd>
@@ -219,7 +219,7 @@ class Form
 				case 'select':
 					$return .= '
 		<dt>
-			<span style="font-weight:bold;">'. $el['text'] .'</span>
+			<span>'. $el['text'] .'</span>
 			<br /><span class="smalltext">'. $el['desc'] .'</span>
 		</dt>
 		<dd>
@@ -248,7 +248,7 @@ class Form
 				case 'html':
 					$return .= '
 				<dt>
-					<span style="font-weight:bold;">'. $el['text'] .'</span>
+					<span>'. $el['text'] .'</span>
 					<br /><span class="smalltext">'. $el['desc'] .'</span>
 				</dt>
 				<dd>
