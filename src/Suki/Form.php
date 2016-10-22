@@ -16,6 +16,7 @@ class Form
 	protected $_buffer = '';
 	protected $_app;
 	protected $_formOptions = array('name' => '',);
+	protected $_counter = 0;
 
 	public function __construct($app)
 	{
@@ -43,12 +44,20 @@ class Form
 
 	protected function addElement($element)
 	{
-		$this->elements[] = $element;
+		$this->elements[++$this->_counter] = $element;
 	}
 
-	public function getElement($id)
+	public function getElements($id = 0)
 	{
-		return $this->elements[$id];
+		return !empty($id) ? $this->elements[$id] : $this->elements;
+	}
+
+	public function modifyElement($id = 0, $data = array())
+	{
+		if (empty($id) || empty($data) || empty($this->elements[$id]))
+			return false;
+
+		$this->elements[$id] = $data;
 	}
 
 	protected function setParamValues(&$param)
