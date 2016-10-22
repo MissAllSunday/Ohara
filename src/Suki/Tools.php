@@ -171,6 +171,6 @@ class Tools
 		$pow = floor(($bytes ? log($bytes) : 0) / log($log));
 		$pow = min($pow, count($units) - 1);
 		$bytes /= (1 << (10 * $pow));
-		return round($bytes, 4) . ($showUnits ? ' ' . $units[$pow] : '');
+		return round($bytes, 2) . ($showUnits ? ' ' . $units[$pow] : '');
 	}
 }

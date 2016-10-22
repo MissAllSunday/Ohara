@@ -59,7 +59,7 @@ class Data
 
 		foreach ($data as $name => $value)
 		{
-			$this->_request[$name] = $_REQUEST[$name] = $this->sanitize($this->_request[$value]);
+			$this->_request[$name] = $_REQUEST[$name] = $this->sanitize($value);
 		}
 
 		return $this->_request;

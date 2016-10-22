@@ -15,7 +15,7 @@ class Form
 	public $elements = array();
 	protected $_buffer = '';
 	protected $_app;
-	protected $_formOptions = array('name' => '',);
+	protected $_options = array('name' => '',);
 	protected $_counter = 0;
 
 	public function __construct($app)
@@ -151,7 +151,7 @@ class Form
 	public function addHr($custom = '')
 	{
 		$param['type'] = 'hr';
-		$param['html'] = $custom ? $custom : '<br /><hr /><br />';
+		$param['html'] = $custom ? $custom : '<br><hr><br>';
 
 		return $this->addElement($param);
 	}
@@ -207,61 +207,61 @@ class Form
 				case 'textarea':
 				case 'checkbox':
 				case 'text':
-					$return .= '
+					$this->_buffer .= '
 		<dt>
 			<span>'. $el['text'] .'</span>
-			<br /><span class="smalltext">'. $el['desc'] .'</span>
+			<br><span class="smalltext">'. $el['desc'] .'</span>
 		</dt>
 		<dd>
 			<input type="hidden" name="'. (!empty($this->_formOptions['name']) ? $this->_formOptions['name'] .'['. $el['name'] .']' : $el['name']) .'" value="0" />'. $el['html'] .'
 		</dd>';
 					break;
 				case 'select':
-					$return .= '
+					$this->_buffer .= '
 		<dt>
 			<span>'. $el['text'] .'</span>
-			<br /><span class="smalltext">'. $el['desc'] .'</span>
+			<br><span class="smalltext">'. $el['desc'] .'</span>
 		</dt>
 		<dd>
 			<input type="hidden" name="'. (!empty($this->_formOptions['name']) ? $this->_formOptions['name'] .'['. $el['name'] .']' : $el['name']) .'" value="0" />'. $el['html_start'] .'';
 
 					foreach($el['values'] as $k => $v)
-						$return .= $v;
+						$this->_buffer .= $v;
 
-					$return .= $el['html_end'] .'
+					$this->_buffer .= $el['html_end'] .'
 				</dd>';
 					break;
 				case 'hidden':
 				case 'submit':
-					$return .= '
+					$this->_buffer .= '
 				<dt></dt>
 				<dd>
 					'. $el['html'] .'
 				</dd>';
 					break;
 				case 'hr':
-					$return .= '
+					$this->_buffer .= '
 				</dl>
 					'. $el['html'] .'
 				<dl class="settings">';
 					break;
 				case 'html':
-					$return .= '
+					$this->_buffer .= '
 				<dt>
 					<span>'. $el['text'] .'</span>
-					<br /><span class="smalltext">'. $el['desc'] .'</span>
+					<br><span class="smalltext">'. $el['desc'] .'</span>
 				</dt>
 				<dd>
 					'. $el['html'] .'
 				</dd>';
 					break;
 				case 'section':
-				$return .= '
+				$this->_buffer .= '
 				</dl>
 				<div class="cat_bar">
 					<h3 class="catbg">'. $el['text'] .'</h3>
 				</div>
-				<br />
+				<br>
 				<dl class="settings">';
 					break;
 			}
