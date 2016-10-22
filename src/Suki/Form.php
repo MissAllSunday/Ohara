@@ -13,9 +13,9 @@ namespace Suki;
 class Form
 {
 	public $elements = array();
-	public $buffer = '';
+	protected $_buffer = '';
 	protected $_app;
-	protected $_formOptions = array('name' => '', 'url' => '', 'title' => '', 'desc' => '', 'template' => '', 'textPrefix' = '');
+	protected $_formOptions = array('name' => '',);
 
 	public function __construct($app)
 	{
@@ -24,10 +24,16 @@ class Form
 
 	public function setOptions($options = array())
 	{
+		global $context;
+
 		if (empty($options))
 			return false;
 
 		$this->_options = array_merge($this->_options, $options);
+
+		// Always add the session if available.
+		if (!empty($context['session_var']) && !empty($context['session_id']))
+			$this->addHiddenField($context['session_var'], $context['session_id']);
 	}
 
 	protected function setText($text)
@@ -182,7 +188,7 @@ class Form
 
 	public function display()
 	{
-		return = '
+		$this->_buffer = '
 	<dl class="settings">';
 
 		foreach($this->elements as $el)
@@ -252,10 +258,9 @@ class Form
 			}
 		}
 
-		$return .= '
+		$this->_buffer .= '
 			</dl>';
 
-		// Return return DUH!
-		return $return;
+		return $this->_buffer;
 	}
 }
