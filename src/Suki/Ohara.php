@@ -279,12 +279,14 @@ class Ohara extends \Pimple\Container
 
 	/**
 	 * Returns the actual value of the selected $modSetting
-	 * uses Ohara::enable() to determinate if the var exists
+	 * If no setting exists and a default value has been defined, the default value is returned.
+	 * This is a shortcut for cases like: $var = !empty($modSettings['foo']) ? $modSettings['foo'] : 'baz';
 	 * @param string $var The name of the $modSetting key you want to retrieve
+	 * @param mixed $default The default value used if the setting doesn't exists.
 	 * @access public
 	 * @return mixed|boolean
 	 */
-	public function setting($var)
+	public function setting($var, $default = null)
 	{
 		global $modSettings;
 
@@ -296,72 +298,32 @@ class Ohara extends \Pimple\Container
 			return $modSettings[$this->name .'_'. $var];
 
 		else
-			return false;
-	}
-
-	/**
-	 * Returns the actual value of the selected $modSetting
-	 * If no setting exists, the default value is returned.
-	 * This is a shortcut for cases like: $var = !empty($modSettings['foo']) ? $modSettings['foo'] : 'baz';
-	 * @param string $var The name of the $modSetting key you want to retrieve
-	 * @param mixed $default The default value used if the setting doesn't exists.
-	 * @access public
-	 * @return mixed|boolean
-	 */
-	public settingDefault($var, $default)
-	{
-		global $modSettings;
-
-		// This should be extended by somebody else...
-		if (empty($this->name) || empty($var) || is_null($default))
-			return false;
-
-		return !empty($modSettings[$this->name .'_'. $var]) ? $modSettings[$this->name .'_'. $var] : $default;
-	}
-
-	/**
-	 * Returns the actual value of the selected $modSetting
-	 * If no setting exists, the default value is returned.
-	 * This is a shortcut for cases like: $var = !empty($modSettings['foo']) ? $modSettings['foo'] : 'baz';
-	 * @param string $var The name of the $modSetting key you want to retrieve
-	 * @param mixed $default The default value used if the setting doesn't exists.
-	 * @access public
-	 * @return mixed|boolean
-	 */
-	public modSettingDefault($var, $default)
-	{
-		global $modSettings;
-
-		// This should be extended by somebody else...
-		if (empty($this->name) || empty($var) || is_null($default))
-			return false;
-
-		return !empty($modSettings[$var]) ? $modSettings[$var] : $default;
+			return !is_null($default) ? $default : false;
 	}
 
 	/**
 	 * Returns the actual value of a generic $modSetting var
-	 * useful to check external $modSettings vars
+	 * Useful to check external $modSettings vars
+	 * If no setting exists and a default value has been defined, the default value is returned.
+	 * This is a shortcut for cases like: $var = !empty($modSettings['foo']) ? $modSettings['foo'] : 'baz';
 	 * @param string $var The name of the $modSetting key you want to retrieve
+	 * @param mixed $default The default value used if the setting doesn't exists.
 	 * @access public
 	 * @return mixed|boolean
 	 */
-	public function modSetting($var)
+	public function modSetting($var, $default = null)
 	{
 		global $modSettings;
 
 		// This should be extended by somebody else...
-		if (empty($this->name))
-			return false;
-
-		if (empty($var))
+		if (empty($this->name) || empty($var))
 			return false;
 
 		if (isset($modSettings[$var]))
 			return $modSettings[$var];
 
 		else
-			return false;
+			return !is_null($default) ? $default : false;
 	}
 
 	/**
