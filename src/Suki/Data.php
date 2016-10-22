@@ -41,6 +41,31 @@ class Data
 	}
 
 	/**
+	 * Inserts a new value to {@link $_request}
+	 * @param array $data an array of data to be added. Uses a name => value format.
+	 * @access public
+	 * @return mixed false on fail array.
+	 */
+	public function putData($data = array())
+	{
+		if (empty($data))
+			return false;
+
+		// Forgot something?
+		if (empty($this->_request))
+			$this->setData();
+
+		$data = (array) $data;
+
+		foreach ($data as $name => $value)
+		{
+			$this->_request[$name] = $_REQUEST[$name] = $this->sanitize($this->_request[$value]);
+		}
+
+		return $this->_request;
+	}
+
+	/**
 	 * Sanitizes and returns the requested value.
 	 * calls Ohara::sanitize() to properly clean up
 	 * @param string $var the superglobal's key name you want to retrieve
