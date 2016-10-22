@@ -64,6 +64,10 @@ class Config
 	 */
 	public function get($name = '')
 	{
+		// Not defined huh?
+		if (empty(static::$_config[$this->_app->name]))
+			$this->getConfig();
+
 		return $name ? (!empty(static::$_config[$this->_app->name]['_'. $name]) ? static::$_config[$this->_app->name]['_'. $name] : false) : (!empty(static::$_config[$this->_app->name]) ? static::$_config[$this->_app->name] : false);
 	}
 
