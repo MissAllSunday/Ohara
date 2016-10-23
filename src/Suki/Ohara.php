@@ -2,21 +2,21 @@
 
 /**
  * @package Ohara helper class
- * @version 1.0.5
+ * @version 1.1
  * @author Jessica González <suki@missallsunday.com>
  * @copyright Copyright (c) 2016, Jessica González
  * @license http://www.mozilla.org/MPL/2.0/
  */
 
 namespace Suki;
-use Suki\ClassLoader;
+use Pimple\Container;
 
 /**
  * Helper class for SMF modifications
  * @package Ohara helper class
  * @subpackage classes
  */
-class Ohara
+class Ohara extends \Pimple\Container
 {
 	/**
 	 * The main identifier for the class extending Ohara, needs to be re-defined by each extending class
@@ -31,34 +31,30 @@ class Ohara
 	 * @access protected
 	 * @var array
 	 */
-	protected $_text = array();
+	public $text = array();
 
-	/**
-	 * An array holding up all instances extending Ohara
-	 * @static
-	 * @access protected
-	 * @var array
-	 */
-	protected static $_registry = array();
-
-	protected static $_config = array();
-
-	/**
-	 * A security check to make sure the mod does want to use a config file.
-	 * @static
-	 * @access protected
-	 * @var boolean
-	 */
-	protected $_useConfig = false;
-
-	/**
-	 * Holds any sanitized data from $_REQUEST
-	 * @access protected
-	 * @var array
-	 */
-	protected $_request = array();
+	public $useConfig = false;
 
 	protected static $loader;
+
+	protected $_services = array(
+		'tools',
+		'form',
+		'config',
+		'loader',
+		'data',
+	);
+
+	protected function set()
+	{
+		foreach($this->_services as $s)
+			$this[$s] = function ($c) use ($s)
+			{
+				// Build the  right namespace.
+				$call = __NAMESPACE__ .'\\'. ucfirst($s);
+				return new $call($c);
+			};
+	}
 
 	/**
 	 * Getter for {@link $name} property.
@@ -68,62 +64,6 @@ class Ohara
 	public function getName()
 	{
 		return $this->name;
-	}
-
-	/**
-	 * Gets any valid config library vars and setup an autoloader for them.
-	 * @access public
-	 * @return void
-	 */
-	public function autoLoad($force = false)
-	{
-		if (null !== self::$loader && !$force)
-			return self::$loader;
-
-		// Yep, manually loaded...
-		require_once ($this->sourceDir .'/ohara/src/Suki/ClassLoader.php');
-
-		// Define some of the most commonly used dirs.
-		$vendorDir = $this->boardDir .'/vendor';
-		$baseDir = dirname($vendorDir);
-		self::$loader = $loader = new ClassLoader();
-		$replacements = array(
-			'$vendorDir' => $vendorDir,
-			'$baseDir' => $baseDir,
-			'$boarddir' => $this->boardDir,
-			'$sourcedir' => $this->sourceDir,
-		);
-
-		if ($this->config('libNamespace'))
-			foreach ($this->config('libNamespace') as $namespace => $path)
-			{
-				$path = (array) $path;
-				$path[0] = $this->parser($path[0], $replacements);
-				$loader->set($namespace, $path);
-			}
-
-		if ($this->config('libPSR'))
-			foreach ($this->config('libPSR') as $namespace => $path)
-			{
-				$path = (array) $path;
-				$path[0] = $this->parser($path[0], $replacements);
-				$loader->setPsr4($namespace, $this->parser($path, $replacements));
-			}
-
-		if ($this->config('libClassMap'))
-			foreach ($this->config('libClassMap') as $name => $classMap)
-			{
-				$that = $this;
-				$classMap = (array) $classMap;
-				$classMap = array_map(function($map) use ($that, $replacements) { return $that->parser($map, $replacements); }, $classMap);
-				$path[0] = $this->parser($path[0], $replacements);
-				$loader->addClassMap($this->parser($classMap, $replacements));
-				unset($that);
-			}
-
-		$loader->register(true);
-
-		return $loader;
 	}
 
 	/**
@@ -143,10 +83,11 @@ class Ohara
 		$this->boardDir = $boarddir;
 		$this->boardUrl = $boardurl;
 
-		static::$_registry[$this->name] = $this;
+		// Create the services.
+		$this->set();
 
 		// Get this mod's config file.
-		$this->getConfigFile();
+		$this['config']->getConfig();
 
 		// Any runtime hooks?
 		$this->createHooks();
@@ -161,65 +102,6 @@ class Ohara
 	public function getRegistry($instance = '')
 	{
 		return $instance ? (!empty(static::$_registry[$instance]) ? static::$_registry[$instance] : false) : (!empty(static::$_registry) ? static::$_registry : false);
-	}
-
-	/**
-	 * Gets a mod's config file, loads it and store it on {@link $_config}
-	 * @access public
-	 * @return array
-	 */
-	protected function getConfigFile()
-	{
-		global $txt;
-
-		$file = $this->boardDir .'/_config'. $this->name .'.json';
-
-		// No config file needed.
-		if (!$this->_useConfig)
-			return static::$_config[$this->name] = array();
-
-		// Already loaded?
-		if (!empty(static::$_config[$this->name]))
-			return static::$_config[$this->name];
-
-		// Get the json file. Must be located in Sources folder and must be named:
-		if (!file_exists($file))
-		{
-			loadLanguage('Errors');
-			log_error(sprintf($txt['error_bad_file'], $file));
-
-			return static::$_config[$this->name] = array();
-		}
-
-		else
-		{
-			$jsonArray = json_decode(file_get_contents($file), true);
-
-			$result = json_last_error() == JSON_ERROR_NONE;
-
-			// Everything went better than expected!
-			if ($result)
-				return static::$_config[$this->name] = $jsonArray;
-
-			else
-			{
-				loadLanguage('Errors');
-				log_error(sprintf($txt['error_bad_file'], $file));
-
-				return static::$_config[$this->name] = array();
-			}
-		}
-	}
-
-	/**
-	 * Gets a specific mod config array.
-	 * @access public
-	 * @param string $name The name of an specific setting, if empty it will return the entire array.
-	 * @return mixed
-	 */
-	protected function config($name = '')
-	{
-		return $name ? (!empty(static::$_config[$this->name]['_'. $name]) ? static::$_config[$this->name]['_'. $name] : false) : (!empty(static::$_config[$this->name]) ? static::$_config[$this->name] : false);
 	}
 
 	/**
@@ -242,11 +124,11 @@ class Ohara
 		global $context;
 
 		// Get the hooks.
-		$hooks = $this->config('availableHooks');
-		$overwriteHooks = $this->config('overwriteHooks');
+		$hooks = $this['config']->get('availableHooks');
+		$overwriteHooks = $this['config']->get('overwriteHooks');
 
 		// Don't execute on uninstall.
-		if (!empty($context['uninstalling']) || $this->data('sa') == 'uninstall2' || !$hooks)
+		if (!empty($context['uninstalling']) || $this['data']->get('sa') == 'uninstall2' || !$hooks)
 			return;
 
 		foreach ($hooks as $hook => $hook_name)
@@ -295,7 +177,7 @@ class Ohara
 	 */
 	public function disableHooks(&$config_vars)
 	{
-		$hooks = $this->config('availableHooks');
+		$hooks = $this['config']->get('availableHooks');
 
 		// No hooks were found. Nothing to do.
 		if (!$hooks)
@@ -397,12 +279,14 @@ class Ohara
 
 	/**
 	 * Returns the actual value of the selected $modSetting
-	 * uses Ohara::enable() to determinate if the var exists
+	 * If no setting exists and a default value has been defined, the default value is returned.
+	 * This is a shortcut for cases like: $var = !empty($modSettings['foo']) ? $modSettings['foo'] : 'baz';
 	 * @param string $var The name of the $modSetting key you want to retrieve
+	 * @param mixed $default The default value used if the setting doesn't exists.
 	 * @access public
 	 * @return mixed|boolean
 	 */
-	public function setting($var)
+	public function setting($var, $default = null)
 	{
 		global $modSettings;
 
@@ -414,351 +298,32 @@ class Ohara
 			return $modSettings[$this->name .'_'. $var];
 
 		else
-			return false;
+			return !is_null($default) ? $default : false;
 	}
 
 	/**
 	 * Returns the actual value of a generic $modSetting var
-	 * useful to check external $modSettings vars
+	 * Useful to check external $modSettings vars
+	 * If no setting exists and a default value has been defined, the default value is returned.
+	 * This is a shortcut for cases like: $var = !empty($modSettings['foo']) ? $modSettings['foo'] : 'baz';
 	 * @param string $var The name of the $modSetting key you want to retrieve
+	 * @param mixed $default The default value used if the setting doesn't exists.
 	 * @access public
 	 * @return mixed|boolean
 	 */
-	public function modSetting($var)
+	public function modSetting($var, $default = null)
 	{
 		global $modSettings;
 
 		// This should be extended by somebody else...
-		if (empty($this->name))
-			return false;
-
-		if (empty($var))
+		if (empty($this->name) || empty($var))
 			return false;
 
 		if (isset($modSettings[$var]))
 			return $modSettings[$var];
 
 		else
-			return false;
-	}
-
-	/**
-	 * Sets {@link $_request} with the value of the requested superglobal var
-	 * can be called directly but its also called by Ohara::data()
-	 * @param string $type request, post or get. The name of the superblogal you want to fetch, defaults to request
-	 * @access public
-	 * @return void
-	 */
-	public function setData($type = 'request')
-	{
-		$types = array('request' => $_REQUEST, 'get' => $_GET, 'post' => $_POST);
-
-		$this->_request = (empty($type) || !isset($types[$type])) ? $_REQUEST : $types[$type];
-
-		unset($types);
-	}
-
-	/**
-	 * Sanitizes and returns the requested value.
-	 * calls Ohara::sanitize() to properly clean up
-	 * @param string $var the superglobal's key name you want to retrieve
-	 * @access public
-	 * @return mixed
-	 */
-	public function data($var)
-	{
-		// Forgot something?
-		if (empty($this->_request))
-			$this->setData();
-
-		$r = $this->validate($var) ? $this->sanitize($this->_request[$var]) : false;
-
-		unset($this->_request);
-
-		return $r;
-	}
-
-	/**
-	 * Checks the var against {@link $_request} to know if it exists and its defined or not.
-	 * calls Ohara::setData() in case {@link $_request} is empty by the time this method its called
-	 * @param string $var the superglobal's key name you want to check
-	 * @access public
-	 * @return boolean
-	 */
-	public function validate($var)
-	{
-		// $var should always be a string, it should be the name of the var you want to validate, not the actual var!
-		if (!is_string($var))
-			return false;
-
-		// Forgot something?
-		if (empty($this->_request))
-			$this->setData();
-
-		return (isset($this->_request[$var]));
-	}
-
-	/**
-	 * Sanitizes a var. Recursive.
-	 * Treats any var as a string and cast it as an integer if necessary.
-	 * @param mixed $var The var you want to sanitize
-	 * @access public
-	 * @return mixed
-	 */
-	public function sanitize($var)
-	{
-		global $smcFunc;
-
-		if (is_array($var))
-		{
-			foreach ($var as $k => $v)
-				$var[$k] = $this->sanitize($v);
-
-			return $var;
-		}
-
-		else
-		{
-			$var = (string) $smcFunc['htmltrim']($smcFunc['htmlspecialchars']($var), ENT_QUOTES);
-
-			if (ctype_digit($var))
-				$var = (int) $var;
-
-			if (empty($var))
-				$var = false;
-		}
-
-		return $var;
-	}
-
-	/**
-	 * Sets a temp var in $_SESSION.
-	 * Ohara automatically creates a new key in $_SESSION using {@link $name}
-	 * @param string $key The unique identifier for your message
-	 * @param mixed $message ideally to store a message but can be used to store any type of variable
-	 * @access public
-	 * @return void|boolean
-	 */
-	public function setUpdate($key, $message)
-	{
-		// Define an update key for this class.
-		if (!isset($_SESSION[$this->name]['update']))
-			$_SESSION[$this->name]['update'] = array();
-
-		// We need a key and an actual message...
-		if (empty($key) || empty($message))
-			return false;
-
-		// Store it! or overwrite it!
-		$_SESSION[$this->name]['update'][$key] = $message;
-	}
-
-	/**
-	 * Gets the var previously added by Ohara::setUpdate()
-	 * calls Ohara::cleanUpdate() to delete the entry from $_SESSION
-	 * @param string $key The unique identifier for your message
-	 * @access public
-	 * @return mixed
-	 */
-	public function getUpdate($key)
-	{
-		if (empty($key))
-			return false;
-
-		$update =  !empty($_SESSION[$this->name]['update'][$key]) ? $_SESSION[$this->name]['update'][$key] : false;
-
-		if (!empty($update))
-			$this->cleanUpdate($key);
-
-		return $update;
-	}
-
-	/**
-	 * Gets all vars associated with the the extending class using {@link $name}
-	 * calls Ohara::cleanUpdate() to delete the entry from $_SESSION
-	 * @access public
-	 * @return mixed|boolean
-	 */
-	public function getAllUpdates()
-	{
-		$update =  !empty($_SESSION[$this->name]['update']) ? $_SESSION[$this->name]['update'] : false;
-
-		// Clean em all!
-		$this->cleanUpdate();
-
-		return $update;
-	}
-
-	/**
-	 * Deletes the key from $_SESSION
-	 * automatically called by any getter after retrieving the needed message.
-	 * @param string $key The unique identifier for your message. No key means all messages will be cleaned.
-	 * @access public
-	 */
-	public function cleanUpdate($key = false)
-	{
-		// No key means you want to clean em all.
-		if (empty($key))
-			unset($_SESSION[$this->name]['update']);
-
-		else
-			unset($_SESSION[$this->name]['update'][$key]);
-	}
-
-	/**
-	 * Checks if a string contains a scheme. Adds one if necessary
-	 * checks for schemaless urls.
-	 * @param string $url The data to be converted, needs to be an array.
-	 * @param boolean $secure If a scheme has to be added, check if https should be used.
-	 * @access public
-	 * @return string The passed string.
-	 */
-	public function checkScheme($url = '', $secure = false)
-	{
-		$parsed = array();
-		$parsed = parse_url($url);
-		$pos = strpos($url, '//');
-
-		// Perhaps this is a schema less url? parse_url should detect schema less urls .___.
-		if (empty($parsed['scheme']) && strpos($url, '//') !== false)
-			return $url;
-
-		elseif (empty($parsed['scheme']))
-			return 'http'. ($secure ? 's' : '') .'://'. $url;
-
-		else
-			return $url;
-	}
-
-	/**
-	 * Outputs a json encoded string
-	 * It assumes the data is a valid array.
-	 * @param array $data The data to be converted, needs to be an array
-	 * @access public
-	 * @return boolean whether or not the data was encoded and outputted
-	 */
-	public function jsonResponse($data = array())
-	{
-		global $db_show_debug;
-
-		$json = '';
-		$result = false;
-
-		// Defensive programming anyone?
-		if (empty($data))
-			return false;
-
-		// This is pretty simply, just encode the supplied data and be done with it.
-		$json = json_encode($data);
-
-		$result = json_last_error() == JSON_ERROR_NONE;
-
-		if ($result)
-		{
-			// Don't need extra stuff...
-			$db_show_debug = false;
-
-			// Kill anything else
-			ob_end_clean();
-
-			if ($this->modSetting('CompressedOutput'))
-				@ob_start('ob_gzhandler');
-
-			else
-				ob_start();
-
-			// Set the header.
-			header('Content-Type: application/json');
-
-			// Echo!
-			echo $json;
-
-			// Done
-			obExit(false);
-		}
-
-		return $result;
-	}
-
-	/**
-	 * Parses and replace tokens by their given values.
-	 * also automatically adds the session var for href tokens.
-	 * @access public
-	 * @param string $text The raw text.
-	 * @param array $replacements a key => value array containing all tokens to be replaced.
-	 * @return string|bool
-	 */
-	public function parser($text, $replacements = array())
-	{
-		global $context;
-
-		if (empty($text) || empty($replacements) || !is_array($replacements))
-			return '';
-
-		// Split the replacements up into two arrays, for use with str_replace.
-		$find = array();
-		$replace = array();
-
-		foreach ($replacements as $f => $r)
-		{
-			$find[] = '{' . $f . '}';
-			$replace[] = $r . ((strpos($f,'href') !== false) ? (';'. $context['session_var'] .'='. $context['session_id']) : '');
-		}
-
-		// Do the variable replacements.
-		return str_replace($find, $replace, $text);
-	}
-
-	/**
-	 * Checks and returns a comma separated string.
-	 * @access public
-	 * @param string $string The string to check and format
-	 * @param string $type The type to check against. Accepts "numeric", "alpha" and "alphanumeric".
-	 * @param string $delimiter Used for explode/imploding the string.
-	 * @return string|bool
-	 */
-	public function commaSeparated($string, $type = 'alphanumeric', $delimiter = ',')
-	{
-		if (empty($string))
-			return false;
-
-		switch ($type) {
-			case 'numeric':
-				$t = '\d';
-				break;
-			case 'alpha':
-				$t = '[:alpha:]';
-				break;
-			case 'alphanumeric':
-			default:
-				$t = '[:alnum:]';
-				break;
-		}
-		return empty($string) ? false : implode($delimiter, array_filter(explode($delimiter, preg_replace(
-			array(
-				'/[^'. $t .',]/',
-				'/(?<='. $delimiter .')'. $delimiter .'+/',
-				'/^'. $delimiter .'+/',
-				'/'. $delimiter .'+$/'
-			), '', $string
-		))));
-	}
-
-	/**
-	 * Returns a formatted string.
-	 * @access public
-	 * @param string|int  $bytes A number of bytes.
-	 * @param bool $showUnits To show the unit symbol or not.
-	 * @return string
-	 */
-	public function formatBytes($bytes, $showUnits = false)
-	{
-		$units = array('B', 'KB', 'MB', 'GB', 'TB');
-		$bytes = max($bytes, 0);
-		$pow = floor(($bytes ? log($bytes) : 0) / log(1024));
-		$pow = min($pow, count($units) - 1);
-		$bytes /= (1 << (10 * $pow));
-		return round($bytes, 4) . ($showUnits ? ' ' . $units[$pow] : '');
+			return !is_null($default) ? $default : false;
 	}
 
 	/**
@@ -771,8 +336,8 @@ class Ohara
 	public function addActions(&$actions)
 	{
 		// This needs to be set and extended by someone else!
-		$hooks = $this->config('availableHooks');
-		$oActions = $this->config('actions');
+		$hooks = $this['config']->get('availableHooks');
+		$oActions = $this['config']->get('actions');
 		$counter = 0;
 
 		if (empty($hooks['actions']))
@@ -814,7 +379,7 @@ class Ohara
 		global $context;
 
 		// This needs to be set and extended by someone else!
-		$hooks = $this->config('availableHooks');
+		$hooks = $this['config']->get('availableHooks');
 
 		if (!$hooks['credits'])
 			return;
@@ -824,7 +389,7 @@ class Ohara
 
 	/**
 	 * Add a set of config vars.
-	 * This is a much smaller approach than addAdminArea, its designed to use the integrate_general_mod_settings and add a very simple set or config vars. Useful for small mods that doesn't have a lot of settings.
+	 * This is a much smaller approach than addAdminArea, its designed to use the integrate_general_mod_settings hook and adds a very simple set of config vars. Useful for small mods that doesn't have a lot of settings.
 	 * Uses $config['simpleSettings'] to determinate the number of settings to add.
 	 * Mods can still overwrite this method to add more complex settings.
 	 * @access public
@@ -833,12 +398,12 @@ class Ohara
 	public function addSimpleSettings(&$config_vars)
 	{
 		// This needs to be set and extended by someone else!
-		$hooks = $this->config('availableHooks');
+		$hooks = $this['config']->get('availableHooks');
 
 		if (!$hooks['simpleSettings'])
 			return;
 
-		$sSettings = $this->config('simpleSettings');
+		$sSettings = $this['config']->get('simpleSettings');
 
 		if (!empty($sSettings) && is_array($sSettings))
 			foreach ($sSettings as $s)
@@ -860,12 +425,12 @@ class Ohara
 	public function addPermissions(&$permissionGroups, &$permissionList)
 	{
 		// This needs to be set and extended by someone else!
-		$hooks = $this->config('availableHooks');
+		$hooks = $this['config']->get('availableHooks');
 
 		if (!$hooks['permissions'])
 			return;
 
-		$customPerm = $this->config('permissions');
+		$customPerm = $this['config']->get('permissions');
 		$identifier = $customPerm['identifier'] ? $customPerm['identifier'] : $this->name;
 		$langFile = $customPerm['langFile'] ? $customPerm['langFile'] : $this->name;
 
@@ -893,7 +458,7 @@ class Ohara
 	public function addHelpAdmin()
 	{
 		// This needs to be set and extended by someone else!
-		$hooks = $this->config('availableHooks');
+		$hooks = $this['config']->get('availableHooks');
 
 		if (!$hooks['helpAdmin'])
 			return;
