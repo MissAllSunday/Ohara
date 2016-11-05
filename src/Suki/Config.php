@@ -90,17 +90,14 @@ class Config
 		// Work with arrays.
 		$values = (array) $values;
 
-		// Custom instance?
-		$instanceName = !empty($instanceName) ? $instanceName : $this->_app->name;
-
 		// Does it exists?
-		if (empty(static::$_config[$instanceName]))
-			return array();
+		if (!$this->_config)
+			$this->getConfig();
 
 		// Perform. Overwrite the values.
-		static::$_config[$instanceName] = array_merge(static::$_config[$instanceName], $values);
+		$this->_config = array_merge($this->_config, $values);
 
 		// Done!
-		return static::$_config[$instanceName];
+		return $this->_config;
 	}
 }
