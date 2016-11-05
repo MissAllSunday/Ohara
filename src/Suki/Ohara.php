@@ -212,7 +212,7 @@ class Ohara extends \Pimple\Container
 		global $txt;
 
 		// This should be extended by somebody else...
-		if (empty($this->name) || empty($var))
+		if (!$this->name || empty($var))
 			return false;
 
 		if (!isset($this->_text[$var]))
@@ -291,7 +291,7 @@ class Ohara extends \Pimple\Container
 		global $modSettings;
 
 		// This should be extended by somebody else...
-		if (empty($this->name) || empty($var))
+		if (!$this->name || empty($var))
 			return false;
 
 		if (true == $this->enable($var))
@@ -316,7 +316,7 @@ class Ohara extends \Pimple\Container
 		global $modSettings;
 
 		// This should be extended by somebody else...
-		if (empty($this->name) || empty($var))
+		if (!$this->name || empty($var))
 			return false;
 
 		if (isset($modSettings[$var]))

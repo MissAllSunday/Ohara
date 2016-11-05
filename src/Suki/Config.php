@@ -36,7 +36,7 @@ class Config
 			return $this->_config = array();
 
 		// Already loaded?
-		if (!empty($this->_config))
+		if ($this->_config)
 			return $this->_config;
 
 		// Check for a $modSettings key first.
@@ -64,7 +64,7 @@ class Config
 	 */
 	public function get($name = '')
 	{
-		// This needs to be extendewd by somebody else!
+		// This needs to be extended by somebody else!
 		if(!$this->_app->name)
 			return array();
 
@@ -72,7 +72,7 @@ class Config
 		if (!$this->_config)
 			$this->getConfig();
 
-		return $name ? (isset($this->_config['_'. $name]) ? $this->_config['_'. $name] : false) : ($this->_config ? $this->_config : false);
+		return $name ? (isset($this->_config['_'. $name]) ? $this->_config['_'. $name] : false) : $this->_config;
 	}
 
 	/**

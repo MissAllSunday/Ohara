@@ -52,7 +52,7 @@ class Data
 			return false;
 
 		// Forgot something?
-		if (empty($this->_request))
+		if (!$this->_request)
 			$this->setData();
 
 		$data = (array) $data;
@@ -75,7 +75,7 @@ class Data
 	public function get($var)
 	{
 		// Forgot something?
-		if (empty($this->_request))
+		if (!$this->_request)
 			$this->setData();
 
 		$r = $this->validate($var) ? $this->sanitize($this->_request[$var]) : false;
@@ -99,7 +99,7 @@ class Data
 			return false;
 
 		// Forgot something?
-		if (empty($this->_request))
+		if (!$this->_request)
 			$this->setData();
 
 		return (isset($this->_request[$var]));
