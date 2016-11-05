@@ -12,7 +12,7 @@ namespace Suki;
 
 class Config
 {
-	protected static $_config = array();
+	protected $_config = array();
 	protected $_app;
 
 	public function __construct($app)
@@ -33,15 +33,15 @@ class Config
 		$file = $this->_app->boardDir .'/_config'. $this->_app->name .'.json';
 
 		if (!$this->_app->useConfig)
-			return static::$_config[$this->_app->name] = array();
+			return $this->_config = array();
 
 		// Already loaded?
-		if (!empty(static::$_config[$this->_app->name]))
-			return static::$_config[$this->_app->name];
+		if (!empty($this->_config))
+			return $this->_config;
 
 		// Check for a $modSettings key first.
 		if (!empty($modSettings['_config'. $this->_app->name]))
-			return static::$_config[$this->_app->name] = smf_json_decode($modSettings['_config'. $this->_app->name], true);
+			return $this->_config = smf_json_decode($modSettings['_config'. $this->_app->name], true);
 
 		// Get the json file. Must be located in $boarddir folder.
 		if (!file_exists($file))
@@ -49,39 +49,42 @@ class Config
 			loadLanguage('Errors');
 			log_error(sprintf($txt['error_bad_file'], $file));
 
-			return static::$_config[$this->_app->name] = array();
+			return $this->_config = array();
 		}
 
 		else
-			return static::$_config[$this->_app->name] = smf_json_decode(file_get_contents($file), true);
+			return $this->_config = smf_json_decode(file_get_contents($file), true);
 	}
 
 	/**
 	 * Gets a specific mod config array.
 	 * @access public
 	 * @param string $name The name of an specific setting, if empty it will return the entire array.
-	 * @return mixed
+	 * @return array
 	 */
 	public function get($name = '')
 	{
+		// This needs to be extendewd by somebody else!
+		if(!$this->_app->name)
+			return array();
+
 		// Not defined huh?
-		if (empty(static::$_config[$this->_app->name]))
+		if (!$this->_config)
 			$this->getConfig();
 
-		return $name ? (!empty(static::$_config[$this->_app->name]['_'. $name]) ? static::$_config[$this->_app->name]['_'. $name] : false) : (!empty(static::$_config[$this->_app->name]) ? static::$_config[$this->_app->name] : false);
+		return $name ? (isset($this->_config['_'. $name]) ? $this->_config['_'. $name] : false) : ($this->_config ? $this->_config : false);
 	}
 
 	/**
 	 * Insert/Updates a mod config value.
 	 * @access public
 	 * @param array $values an array of values to be inserted, it follows a name => value format
-	 * @param string $instanceName The name of the instance, if empty, $this->_app->name will be used.
 	 * @return array the full modified config array. An empty array if the process couldn't be performed.
 	 */
-	public function put($values = array(), $instanceName = '')
+	public function put($values = array())
 	{
 		// The usual checks.
-		if (empty($values))
+		if (empty($values) || !$this->_app->name)
 			return array();
 
 		// Work with arrays.
