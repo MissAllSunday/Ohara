@@ -97,6 +97,9 @@ class Config
 		// Perform. Overwrite the values.
 		$this->_config = array_merge($this->_config, $values);
 
+		// Save it.
+		updateSettings(array('_config'. $this->_app->name => json_encode($this->_config)));
+
 		// Done!
 		return $this->_config;
 	}
