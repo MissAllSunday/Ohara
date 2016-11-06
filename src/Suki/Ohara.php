@@ -139,7 +139,7 @@ class Ohara extends \Pimple\Container
 
 			// Gotta replace our tokens.
 			if ($overwriteHooks && !empty($overwriteHooks[$hook]))
-				$overwriteHooks[$hook]['file'] = $this->parser($overwriteHooks[$hook]['file'], array(
+				$overwriteHooks[$hook]['file'] = $this['tools']->parser($overwriteHooks[$hook]['file'], array(
 					'$sourcedir' => $this->sourceDir,
 					'$scripturl' => $this->scriptUrl,
 					'$boarddir' => $this->boardDir,
@@ -185,10 +185,10 @@ class Ohara extends \Pimple\Container
 
 		// A title and a description.
 		if ($this->text('disable_hook_title'))
-			$config_vars[] = array('title', 'Ohara_disableHooks_title', 'label' => $this->parser($this->text('disable_hook_title'), array('modname' => $this->name)));
+			$config_vars[] = array('title', 'Ohara_disableHooks_title', 'label' => $this['tools']->parser($this->text('disable_hook_title'), array('modname' => $this->name)));
 
 		if ($this->text('disable_hook_desc'))
-			$config_vars[] = array('desc', 'Ohara_disableHooks_desc', 'label' => $this->parser($this->text('disable_hook_desc'), array('modname' => $this->name)));
+			$config_vars[] = array('desc', 'Ohara_disableHooks_desc', 'label' => $this['tools']->parser($this->text('disable_hook_desc'), array('modname' => $this->name)));
 
 		foreach ($hooks as $hook => $hook_name)
 		{
@@ -197,7 +197,7 @@ class Ohara extends \Pimple\Container
 				continue;
 
 			// Gotta "protect" the admin and settings hooks.
-			$config_vars[] = array('check', $this->name .'_disable_hook_'. $hook_name, 'disabled' => (strpos($hook_name, 'admin') !== false || strpos($hook_name, 'setting') !== false) ? true : false, 'label' => $this->parser($this->text('disable_hook'), array('hook' => $hook_name)), 'subtext' => ($this->text('disable_hook_sub') ? $this->parser($this->text('disable_hook_'. $hook .'_sub'), array('hook' => $hook)) : ''));
+			$config_vars[] = array('check', $this->name .'_disable_hook_'. $hook_name, 'disabled' => (strpos($hook_name, 'admin') !== false || strpos($hook_name, 'setting') !== false) ? true : false, 'label' => $this['tools']->parser($this->text('disable_hook'), array('hook' => $hook_name)), 'subtext' => ($this->text('disable_hook_sub') ? $this['tools']->parser($this->text('disable_hook_'. $hook .'_sub'), array('hook' => $hook)) : ''));
 		}
 	}
 
@@ -212,7 +212,7 @@ class Ohara extends \Pimple\Container
 		global $txt;
 
 		// This should be extended by somebody else...
-		if (empty($this->name) || empty($var))
+		if (!$this->name || empty($var))
 			return false;
 
 		if (!isset($this->_text[$var]))
@@ -291,7 +291,7 @@ class Ohara extends \Pimple\Container
 		global $modSettings;
 
 		// This should be extended by somebody else...
-		if (empty($this->name) || empty($var))
+		if (!$this->name || empty($var))
 			return false;
 
 		if (true == $this->enable($var))
@@ -316,7 +316,7 @@ class Ohara extends \Pimple\Container
 		global $modSettings;
 
 		// This should be extended by somebody else...
-		if (empty($this->name) || empty($var))
+		if (!$this->name || empty($var))
 			return false;
 
 		if (isset($modSettings[$var]))
