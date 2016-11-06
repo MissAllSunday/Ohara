@@ -94,17 +94,6 @@ class Ohara extends \Pimple\Container
 	}
 
 	/**
-	 * Getter for {@link $_registry} property.
-	 * @access public
-	 * @param string $instance The name of the instance you want to retrieve, leave empty to retrieve the entire array
-	 * @return string|array|bool
-	 */
-	public function getRegistry($instance = '')
-	{
-		return $instance ? (!empty(static::$_registry[$instance]) ? static::$_registry[$instance] : false) : (!empty(static::$_registry) ? static::$_registry : false);
-	}
-
-	/**
 	 * Dummy method used by Ohara to run {@link createHooks()} via the child's __construct() method and {@link setRegistry()}.
 	 * Mod authors can extend this to run their own methods as this is intended to be called pretty early in SMF's process (using SMF's integrate_load_theme hook).
 	 * @access public
@@ -197,7 +186,12 @@ class Ohara extends \Pimple\Container
 				continue;
 
 			// Gotta "protect" the admin and settings hooks.
-			$config_vars[] = array('check', $this->name .'_disable_hook_'. $hook_name, 'disabled' => (strpos($hook_name, 'admin') !== false || strpos($hook_name, 'setting') !== false) ? true : false, 'label' => $this['tools']->parser($this->text('disable_hook'), array('hook' => $hook_name)), 'subtext' => ($this->text('disable_hook_sub') ? $this['tools']->parser($this->text('disable_hook_'. $hook .'_sub'), array('hook' => $hook)) : ''));
+			$config_vars[] = array(
+				'check',
+				$this->name .'_disable_hook_'. $hook_name, 'disabled' => (strpos($hook_name, 'admin') !== false || strpos($hook_name, 'setting') !== false) ? true : false,
+				'label' => $this['tools']->parser($this->text('disable_hook'), array('hook' => $hook_name)),
+				'subtext' => ($this->text('disable_hook_sub') ? $this['tools']->parser($this->text('disable_hook_'. $hook .'_sub'), array('hook' => $hook)) : '')
+			);
 		}
 	}
 

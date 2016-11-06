@@ -35,7 +35,7 @@ class Data
 	{
 		$types = array('request' => $_REQUEST, 'get' => $_GET, 'post' => $_POST);
 
-		$this->_request = (empty($type) || !isset($types[$type])) ? $_REQUEST : $types[$type];
+		$this->_request = $this->sanitize((empty($type) || !isset($types[$type])) ? $_REQUEST : $types[$type]);
 
 		unset($types);
 	}
@@ -58,9 +58,7 @@ class Data
 		$data = (array) $data;
 
 		foreach ($data as $name => $value)
-		{
 			$this->_request[$name] = $_REQUEST[$name] = $this->sanitize($value);
-		}
 
 		return $this->_request;
 	}
@@ -68,21 +66,18 @@ class Data
 	/**
 	 * Sanitizes and returns the requested value.
 	 * calls Ohara::sanitize() to properly clean up
-	 * @param string $var the superglobal's key name you want to retrieve
+	 * @param string $var the superglobal's key name you want to retrieve.
+	 * @param mixed $default The default value used if the setting doesn't exists.
 	 * @access public
 	 * @return mixed
 	 */
-	public function get($var)
+	public function get($var, $default = null)
 	{
 		// Forgot something?
 		if (!$this->_request)
 			$this->setData();
 
-		$r = $this->validate($var) ? $this->sanitize($this->_request[$var]) : false;
-
-		unset($this->_request);
-
-		return $r;
+		return $this->validate($var) ? $this->_request[$var] : (!is_null($default) ? $default : false);
 	}
 
 	/**
