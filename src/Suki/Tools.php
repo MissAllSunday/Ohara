@@ -173,4 +173,35 @@ class Tools
 		$bytes /= (1 << (10 * $pow));
 		return round($bytes, 2) . ($showUnits ? ' ' . $units[$pow] : '');
 	}
+
+	/**
+	 * Wrapper function for SMF's redirectexit()
+	 * @access public
+	 * @param string $url A string, identical to what you would normally pass to redirectexit, IE, no $scripturl.
+	 * @param array $options An array of options:
+	 * - token string If defined, sets a token using the string given, if no string is provided, uses a generic name created by Suki\Ohara::$name and appending "_re" to it.
+	 * - tokenType string createToken needs a type, post, get or request, defaults to get.
+	 * - message array Uses Suki\Data::setUpdate() an array with 2 values, the first one array[0] is the message "key", the second array[1] is the "message".
+	 * @return void
+	 */
+	public function redirect($url, $options = array())
+	{
+		global $context;
+
+		// Toc toc token?
+		if (!empty($options['token']))
+		{
+			// No name? why?
+			$name = !is_string($options['token']) ? ($this->_app->name .'_re') : $options['token'];
+
+			createToken($name, (!empty($options['tokenType']) ? $options['tokenType'] : 'get'));
+		}
+
+		// Any messages? uses Suki\Data::setUpdate()
+		if (!empty($options['message']) && is_array($options['message']) && isset($options['message'][0]) && isset($options['message'][1]))
+			$this->_app['data']->setUpdate($m[0], $m[1]);
+
+		// Finally, set a call to redirectexit, append the session var if available.
+		return redirectexit('action=admin;area='. $this->name .';'. (isset($context['session_var']) ? ($context['session_var'] .'='. $context['session_id']) : ''));
+	}
 }
