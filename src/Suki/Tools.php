@@ -188,6 +188,10 @@ class Tools
 	{
 		global $context;
 
+		// Why do you even bother?
+		if (empty($url))
+			return false;
+
 		// Toc toc token?
 		if (!empty($options['token']))
 		{
@@ -202,6 +206,6 @@ class Tools
 			$this->_app['data']->setUpdate($m[0], $m[1]);
 
 		// Finally, set a call to redirectexit, append the session var if available.
-		return redirectexit('action=admin;area='. $this->name .';'. (isset($context['session_var']) ? ($context['session_var'] .'='. $context['session_id']) : ''));
+		return redirectexit($url .';'. (isset($context['session_var']) ? ($context['session_var'] .'='. $context['session_id']) : ''));
 	}
 }
