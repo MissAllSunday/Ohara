@@ -203,7 +203,7 @@ class Tools
 
 		// Any messages? uses Suki\Data::setUpdate()
 		if (!empty($options['message']) && is_array($options['message']) && isset($options['message'][0]) && isset($options['message'][1]))
-			$this->_app['data']->setUpdate($m[0], $m[1]);
+			$this->_app['data']->setUpdate($options['message'][0], $options['message'][1]);
 
 		// Finally, set a call to redirectexit, append the session var if available.
 		return redirectexit($url .';'. (isset($context['session_var']) ? ($context['session_var'] .'='. $context['session_id']) : ''));

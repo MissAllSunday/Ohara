@@ -144,15 +144,15 @@ class Data
 	public function setUpdate($key, $message)
 	{
 		// Define an update key for this class.
-		if (!isset($_SESSION[$this->name]['update']))
-			$_SESSION[$this->name]['update'] = array();
+		if (!isset($_SESSION[$this->_app->name]['update']))
+			$_SESSION[$this->_app->name]['update'] = array();
 
 		// We need a key and an actual message...
 		if (empty($key) || empty($message))
 			return false;
 
 		// Store it! or overwrite it!
-		$_SESSION[$this->name]['update'][$key] = $this->sanitize($message);
+		$_SESSION[$this->_app->name]['update'][$key] = $this->sanitize($message);
 	}
 
 	/**
@@ -167,7 +167,7 @@ class Data
 		if (empty($key))
 			return false;
 
-		$update =  !empty($_SESSION[$this->name]['update'][$key]) ? $_SESSION[$this->name]['update'][$key] : false;
+		$update =  !empty($_SESSION[$this->_app->name]['update'][$key]) ? $_SESSION[$this->_app->name]['update'][$key] : false;
 
 		if (!empty($update))
 			$this->cleanUpdate($key);
@@ -183,7 +183,7 @@ class Data
 	 */
 	public function getAllUpdates()
 	{
-		$update =  !empty($_SESSION[$this->name]['update']) ? $_SESSION[$this->name]['update'] : false;
+		$update =  !empty($_SESSION[$this->_app->name]['update']) ? $_SESSION[$this->_app->name]['update'] : false;
 
 		// Clean em all!
 		$this->cleanUpdate();
@@ -201,9 +201,9 @@ class Data
 	{
 		// No key means you want to clean em all.
 		if (empty($key))
-			unset($_SESSION[$this->name]['update']);
+			unset($_SESSION[$this->_app->name]['update']);
 
 		else
-			unset($_SESSION[$this->name]['update'][$key]);
+			unset($_SESSION[$this->_app->name]['update'][$key]);
 	}
 }
