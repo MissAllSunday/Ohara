@@ -33,11 +33,15 @@ class Data
 	 */
 	public function setData($type = 'request')
 	{
+		// Reset it.
+		$this->_request = false;
+
 		$types = array('request' => $_REQUEST, 'get' => $_GET, 'post' => $_POST);
 
-		$this->_request = $this->sanitize((empty($type) || !isset($types[$type])) ? $_REQUEST : $types[$type]);
+		$type = (empty($type) || !isset($types[$type])) ? $_REQUEST : $types[$type];
+		$this->_request = $this->sanitize($type);
 
-		unset($types);
+		unset($types, $type);
 	}
 
 	/**
@@ -51,9 +55,7 @@ class Data
 		if (empty($data))
 			return false;
 
-		// Forgot something?
-		if (!$this->_request)
-			$this->setData();
+		$this->setData();
 
 		$data = (array) $data;
 
@@ -65,19 +67,34 @@ class Data
 
 	/**
 	 * Sanitizes and returns the requested value.
-	 * calls Ohara::sanitize() to properly clean up
+	 * calls Suki\Data::sanitize() to properly clean up
 	 * @param string $var the superglobal's key name you want to retrieve.
 	 * @param mixed $default The default value used if the setting doesn't exists.
 	 * @access public
 	 * @return mixed
 	 */
-	public function get($var, $default = null)
+	public function get($var = '', $default = null)
 	{
-		// Forgot something?
-		if (!$this->_request)
-			$this->setData();
+		if (empty($var))
+			return false;
+
+		$this->setData();
 
 		return $this->validate($var) ? $this->_request[$var] : (!is_null($default) ? $default : false);
+	}
+
+	/**
+	 * Sanitizes and returns all values.
+	 * calls Suki\Data::sanitize() to properly clean up
+	 * @param string $type The type of superglobal you want to retrieve.
+	 * @access public
+	 * @return array
+	 */
+	public function getAll($type = 'request')
+	{
+		$this->setData($type);
+
+		return $this->_request;
 	}
 
 	/**
