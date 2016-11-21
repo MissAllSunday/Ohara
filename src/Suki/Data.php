@@ -38,8 +38,8 @@ class Data
 
 		$types = array('request' => $_REQUEST, 'get' => $_GET, 'post' => $_POST);
 
-		$type = (empty($type) || !isset($types[$type])) ? $_REQUEST : $types[$type];
-		$this->_request = $this->sanitize($type);
+		$typeSet = (empty($type) || !isset($types[$type])) ? $_REQUEST : $types[$type];
+		$this->_request = $this->sanitize($typeSet);
 
 		unset($types, $type);
 	}
@@ -50,7 +50,7 @@ class Data
 	 * @access public
 	 * @return mixed false on fail array.
 	 */
-	public function putData($data = array())
+	public function put($data = array())
 	{
 		if (empty($data))
 			return false;
