@@ -50,3 +50,5 @@ Thumbs.db
 /.git/
 /phpunit.xml
 /tests/phpunit.xml
+composer.lock
+composer.phar
