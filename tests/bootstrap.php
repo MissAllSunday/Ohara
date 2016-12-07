@@ -1,4 +1,4 @@
-<?
+<?php
 
 define('ROOT', __DIR__);
 
@@ -22,3 +22,11 @@ require_once "vendor/autoload.php";
 
 // And another require.
 require_once "src/Suki/autoload.php";
+
+/**
+ * @param string $template_name
+ */
+function loadLanguage($template_name)
+{
+    // You're fired! You're all fired!
+}
