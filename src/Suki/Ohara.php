@@ -33,6 +33,18 @@ class Ohara extends \Pimple\Container
 	 */
 	public $text = array();
 
+	/**
+	 * Property for specifiying your tables, columns and types:
+	 * 'table1' => array(
+	 *	'column1' => 'type',
+	 *	'column2' => 'int',
+	 *	'column3' => 'string',
+	 * ),
+	 * @access protected
+	 * @var array
+	 */
+	public $_dbSchema = array();
+
 	public $useConfig = false;
 
 	protected static $loader;
@@ -43,6 +55,7 @@ class Ohara extends \Pimple\Container
 		'config',
 		'loader',
 		'data',
+		'db',
 	);
 
 	protected function set()
