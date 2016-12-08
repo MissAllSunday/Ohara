@@ -44,11 +44,20 @@ class Db
 			return false;
 
 		// What table should be updated?  defaults to $this->_app->_dbSchema[0] if no table was specified.
-		$table = isset($this->_app->_dbSchema[$info[0]]) ? $this->_app->_dbSchema[$info[0]] : (isset($this->_app->_dbSchema[0]) ? $this->_app->_dbSchema[0] : $info[0]);
+		$table = isset($this->_app->_dbSchema[$info[0]]) ? $this->_app->_dbSchema[$info[0]] : (isset($this->_app->_dbSchema[0]) ? key($this->_app->_dbSchema) : $info[0]);
 
 		// At this point there should be something, perhaps its a vanilla table or a typo or a non-existant table. If theres something, use it.
 		if (empty($table))
 			return false;
+
+		// Now check the column, it must be declared on the table's array.
+		// I should prob write a nice error class to deal with cases like this, to inform the mod author.
+		if (!array_key_exists($info[1], $table))
+			return false;
+
+		// Not needed but I like clear named vars.
+		else
+			$column = $info[1];
 
 		// Create a nice formatted string.
 		$string = '';
