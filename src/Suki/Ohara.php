@@ -63,7 +63,7 @@ class Ohara extends \Pimple\Container
 		foreach($this->_services as $s)
 			$this[$s] = function ($c) use ($s)
 			{
-				// Build the  right namespace.
+				// Build the right namespace.
 				$call = __NAMESPACE__ .'\\'. ucfirst($s);
 				return new $call($c);
 			};
@@ -274,10 +274,11 @@ class Ohara extends \Pimple\Container
 	{
 		global $modSettings;
 
-		if (empty($var))
+		// This should be extended by somebody else...
+		if (empty($this->name) || empty($var))
 			return false;
 
-		if (isset($modSettings[$this->name .'_'. $var]) && !empty($modSettings[$this->name .'_'. $var]))
+		if (!empty($modSettings[$this->name .'_'. $var]))
 			return true;
 
 		else
@@ -293,19 +294,15 @@ class Ohara extends \Pimple\Container
 	 * @access public
 	 * @return mixed|boolean
 	 */
-	public function setting($var, $default = null)
+	public function setting($var, $default = false)
 	{
 		global $modSettings;
-
-		// This should be extended by somebody else...
-		if (!$this->name || empty($var))
-			return false;
 
 		if (true == $this->enable($var))
 			return $modSettings[$this->name .'_'. $var];
 
 		else
-			return !is_null($default) ? $default : false;
+			return $default;
 	}
 
 	/**
@@ -318,19 +315,15 @@ class Ohara extends \Pimple\Container
 	 * @access public
 	 * @return mixed|boolean
 	 */
-	public function modSetting($var, $default = null)
+	public function modSetting($var, $default = false)
 	{
 		global $modSettings;
-
-		// This should be extended by somebody else...
-		if (!$this->name || empty($var))
-			return false;
 
 		if (isset($modSettings[$var]))
 			return $modSettings[$var];
 
 		else
-			return !is_null($default) ? $default : false;
+			return $default;
 	}
 
 	/**

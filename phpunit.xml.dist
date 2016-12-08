@@ -3,7 +3,7 @@
 	backupGlobals="false"
 	colors="true"
 	verbose="true"
-	bootstrap="vendor/autoload.php">
+	bootstrap="tests/bootstrap.php">
 	<testsuites>
 		<testsuite name="Ohara Test Suite">
 			<directory>./tests/</directory>
