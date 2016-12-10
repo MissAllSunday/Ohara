@@ -115,4 +115,17 @@ class Db
 		// Return the newly inserted ID.
 		return $newID;
 	}
+
+	public function delete($value, $table = '', $column = '')
+	{
+		global $smcFunc;
+
+		if (empty($id) || empty($table) || empty($column))
+			return false;
+
+		// Perform.
+		$smcFunc['db_query']('', '
+			DELETE FROM {db_prefix}' . ($table) . '
+			WHERE '. ($column) .' = '. ($value) .'', array());
+	}
 }
