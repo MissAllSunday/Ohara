@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 
 /**
  * @package Ohara helper class
@@ -83,7 +83,7 @@ class Db
 		return $smcFunc['db_query']('', '
 			UPDATE {db_prefix}' . ($table) . '
 			SET '. ($string) .'
-			WHERE '. ($column) .' IN ({array_int:ids})',
+			WHERE '. ($column) .' IN ({array_'. ($table[$column]) .':ids})',
 			array(
 				'ids' => $ids,
 			)
@@ -109,7 +109,7 @@ class Db
 		$smcFunc['db_insert']('replace', '{db_prefix}' . ($table) .
 			'', $this->_schema[$table], $data, $this->_app->_tableKeys);
 
-		// Get the newly created status ID
+		// Get the newly created ID
 		$newID = $smcFunc['db_insert_id']('{db_prefix}' . ($table), key($this->_schema[$table]));
 
 		// Return the newly inserted ID.
@@ -124,7 +124,7 @@ class Db
 			return false;
 
 		// Perform.
-		$smcFunc['db_query']('', '
+		return $smcFunc['db_query']('', '
 			DELETE FROM {db_prefix}' . ($table) . '
 			WHERE '. ($column) .' = '. ($value) .'', array());
 	}
