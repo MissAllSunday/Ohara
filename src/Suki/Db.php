@@ -39,7 +39,7 @@ class Db
 	}
 
 	/**
-	 * Create s anew entry on x table.
+	 * Creates a new entry on x table.
 	 * Uses {@link $_schema}
 	 * Uses {@link $_tableKeys}
 	 * @access public
@@ -73,9 +73,46 @@ class Db
 		return $newID;
 	}
 
-	public function read()
+	/**
+	 * Reads data from a table.
+	 *
+	 * @param array $params An array with all the params  for the query
+	 * @param array $data An array to pass to $smcFunc casting array
+	 * @param bool $key A boolean value to asign a row as key on the returning array
+	 * @param bool $single A bool to tell the query to return a single value instead of An array
+	 * @return mixed either An array or a var with the query result
+	 */
+	public function read($params, $data, $key = false, $single = false)
 	{
+		global $smcFunc;
+		$dataResult = array();
+		$query = $smcFunc['db_query']('', '
+			SELECT ' . $params['rows'] .'
+			FROM {db_prefix}' . $params['table'] .'
+			'. (!empty($params['join']) ? 'LEFT JOIN '. $params['join'] : '') .'
+			'. (!empty($params['where']) ? 'WHERE '. $params['where'] : '') .'
+				'. (!empty($params['and']) ? 'AND '. $params['and'] : '') .'
+				'. (!empty($params['andTwo']) ? 'AND '. $params['andTwo'] : '') .'
+			'. (!empty($params['order']) ? 'ORDER BY ' . $params['order'] : '') .'
+			'. (!empty($params['limit']) ? 'LIMIT '. $params['limit'] : '') . '',
+			$data
+		);
 
+		if (!empty($single))
+			while ($row = $smcFunc['db_fetch_assoc']($query))
+				$dataResult = $row;
+
+		elseif (!empty($key) && empty($single))
+			while ($row = $smcFunc['db_fetch_assoc']($query))
+				$dataResult[$row[$key]] = $row;
+
+		elseif (empty($single) && empty($key))
+			while ($row = $smcFunc['db_fetch_assoc']($query))
+				$dataResult[] = $row;
+
+		$smcFunc['db_free_result']($query);
+
+		return $dataResult;
 	}
 
 	/**
@@ -130,6 +167,15 @@ class Db
 		);
 	}
 
+	/**
+	 * Deletes an entry from X table.
+	 * @access public
+	 * @param mixed
+	 * @param string $table The table name.
+	 * @param string $table The table name, if left empty and $this->_schema is defined, it will use the first table on it.
+	 * @param string $column The column name, if left empty and $this->_schema[$table] is defined, it will use the first column on it.
+	 * @return void
+	 */
 	public function delete($value, $table = '', $column = '')
 	{
 		global $smcFunc;
