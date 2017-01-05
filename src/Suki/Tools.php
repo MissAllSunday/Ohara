@@ -12,6 +12,12 @@ namespace Suki;
 
 class Tools
 {
+	protected $_commaCases = array(
+		'numeric' => '\d',
+		'alpha' => '[:alpha:]',
+		'alphanumeric' => '[:alnum:]',
+	);
+
 	public function __construct($app)
 	{
 		$this->_app = $app;
@@ -134,18 +140,9 @@ class Tools
 		if (empty($string))
 			return false;
 
-		switch ($type) {
-			case 'numeric':
-				$t = '\d';
-				break;
-			case 'alpha':
-				$t = '[:alpha:]';
-				break;
-			case 'alphanumeric':
-			default:
-				$t = '[:alnum:]';
-				break;
-		}
+		// This is why we can't have nice things...
+		$t = isset($this->_commaCases[$type]) ? $this->_commaCases[$type] : $this->_commaCases['alphanumeric'];
+
 		return empty($string) ? false : implode($delimiter, array_filter(explode($delimiter, preg_replace(
 			array(
 				'/[^'. $t .',]/',
