@@ -210,45 +210,10 @@ class Ohara extends \Pimple\Container
 		if (!$this->name || empty($var))
 			return false;
 
-		if (!isset($this->_text[$var]))
-			$this->setText($var);
-
-		return $this->_text[$var];
-	}
-
-	/**
-	 * Loads the extending class language file and sets a new key in {@link $_text}
-	 * Ohara automatically adds the value of {@link $name} plus and underscore to match the exact $txt key when fetching the var
-	 * @access protected
-	 * @param string $var The name of the $txt key you want to retrieve
-	 * @return bool|string
-	 */
-	protected function setText($var)
-	{
-		global $txt;
-
-		// No var no set.
-		if (empty($var))
-			return false;
-
-		// Load the mod's language file.
+		// Does nothing if the file is already loaded.
 		loadLanguage($this->name);
 
-		if (!empty($txt[$this->name .'_'. $var]))
-			$this->_text[$var] =  $txt[$this->name .'_'. $var];
-
-		else
-			$this->_text[$var] = false;
-	}
-
-	/**
-	 * Getter for {@link $_text}
-	 * @access public
-	 * @return array
-	 */
-	public function getAllText()
-	{
-		return $this->_text;
+		return !empty($txt[$this->name .'_'. $var]) ? $txt[$this->name .'_'. $var] : false;
 	}
 
 	/**
