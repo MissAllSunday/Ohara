@@ -32,11 +32,8 @@ class Config
 
 		$file = $this->_app->boardDir .'/_config'. $this->_app->name .'.json';
 
-		if (!$this->_app->useConfig)
-			return $this->_config = array();
-
-		// Already loaded?
-		if ($this->_config)
+		// Already loaded or does not use config?
+		if ($this->_config || !$this->_app->useConfig)
 			return $this->_config;
 
 		// Check for a $modSettings key first.
@@ -44,16 +41,16 @@ class Config
 			return $this->_config = smf_json_decode($modSettings['_config'. $this->_app->name], true);
 
 		// Get the json file. Must be located in $boarddir folder.
-		if (!file_exists($file))
+		if (!$this->_config && !file_exists($file))
 		{
 			loadLanguage('Errors');
 			log_error(sprintf($txt['error_bad_file'], $file));
-
-			return $this->_config = array();
 		}
 
 		else
-			return $this->_config = smf_json_decode(file_get_contents($file), true);
+			$this->_config = smf_json_decode(file_get_contents($file), true);
+
+		return $this->_config;
 	}
 
 	/**

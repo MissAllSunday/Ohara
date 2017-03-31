@@ -47,15 +47,6 @@ class OharaTest extends PHPUnit_Framework_TestCase
         $this->assertFalse($actual);
     }
 
-    public function testAllText()
-    {
-        $this->testText();
-
-        $actual = array_filter($this->o->getAllText());
-        $this->assertTrue(is_array($actual));
-        $this->assertCount(1, $actual);
-    }
-
     public function testModSettings()
     {
         $actual = $this->o->modSetting('stuff');

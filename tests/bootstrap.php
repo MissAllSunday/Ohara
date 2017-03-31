@@ -10,6 +10,12 @@ global $boarddir, $boardurl, $context, $txt;
 // Mock functions
 function loadLanguage($template_name){}
 function log_error(){}
+function add_integration_function(){}
+function remove_integration_function(){}
+function smf_json_decode($s, $array = true)
+{
+	return json_decode($s, $array);
+}
 
 $sourcedir = $scripturl = $boarddir = $boardurl = ROOT;
 
@@ -27,4 +33,3 @@ require_once "vendor/autoload.php";
 
 // And another require.
 require_once "src/Suki/autoload.php";
-
