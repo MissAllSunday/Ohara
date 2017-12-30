@@ -5,12 +5,11 @@ A helper class to be used by SMF modifications (Mods).
 
 #### To be able to use this helper class you need to follow some requirements:
 
-- Needs PHP 5.6 or higher. SMF 2.1.
+- Needs PHP 7.0 or higher. SMF 2.1.
 - Include it or require it on your own file. You can also use composer:
 
- ```json
-"require": {
-		"suki/ohara": "~1.1",
+ ```command
+$ composer require suki/ohara
 	}
  ```
 
