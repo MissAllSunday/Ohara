@@ -4,7 +4,7 @@
  * @package Ohara helper class
  * @version 1.1
  * @author Jessica González <suki@missallsunday.com>
- * @copyright Copyright (c) 2016, Jessica González
+ * @copyright Copyright (c) 2018, Jessica González
  * @license http://www.mozilla.org/MPL/2.0/
  */
 
@@ -12,10 +12,10 @@ namespace Suki;
 
 class Config
 {
-	protected $_config = array();
+	protected $_config = [];
 	protected $_app;
 
-	public function __construct($app)
+	public function __construct(Suki\Ohara $app)
 	{
 		$this->_app = $app;
 	}
@@ -63,7 +63,7 @@ class Config
 	{
 		// This needs to be extended by somebody else!
 		if(!$this->_app->name)
-			return array();
+			return [];
 
 		// Not defined huh?
 		if (!$this->_config)
@@ -82,7 +82,7 @@ class Config
 	{
 		// The usual checks.
 		if (empty($values) || !$this->_app->name)
-			return array();
+			return [];
 
 		// Work with arrays.
 		$values = (array) $values;

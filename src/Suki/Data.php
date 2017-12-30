@@ -4,7 +4,7 @@
  * @package Ohara helper class
  * @version 1.1
  * @author Jessica González <suki@missallsunday.com>
- * @copyright Copyright (c) 2016, Jessica González
+ * @copyright Copyright (c) 2018, Jessica González
  * @license http://www.mozilla.org/MPL/2.0/
  */
 
@@ -12,7 +12,7 @@ namespace Suki;
 
 class Data
 {
-	public function __construct($app)
+	public function __construct(Suki\Ohara $app)
 	{
 		$this->_app = $app;
 	}
@@ -22,7 +22,7 @@ class Data
 	 * @access protected
 	 * @var array
 	 */
-	protected $_request = array();
+	protected $_request = [];
 
 	/**
 	 * Sets {@link $_request} with the value of the requested superglobal var
@@ -162,7 +162,7 @@ class Data
 	{
 		// Define an update key for this class.
 		if (!isset($_SESSION[$this->_app->name]['update']))
-			$_SESSION[$this->_app->name]['update'] = array();
+			$_SESSION[$this->_app->name]['update'] = [];
 
 		// We need a key and an actual message...
 		if (empty($key) || empty($message))

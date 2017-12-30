@@ -4,7 +4,7 @@
  * @package Ohara helper class
  * @version 1.1
  * @author Jessica González <suki@missallsunday.com>
- * @copyright Copyright (c) 2016, Jessica González
+ * @copyright Copyright (c) 2018, Jessica González
  * @license http://www.mozilla.org/MPL/2.0/
  */
 
@@ -18,7 +18,7 @@ class Tools
 		'alphanumeric' => '[:alnum:]',
 	);
 
-	public function __construct($app)
+	public function __construct(Suki\Ohara $app)
 	{
 		$this->_app = $app;
 	}
@@ -33,7 +33,7 @@ class Tools
 	 */
 	public function checkScheme($url = '', $secure = false)
 	{
-		$parsed = array();
+		$parsed = [];
 		$parsed = parse_url($url);
 		$pos = strpos($url, '//');
 
@@ -114,8 +114,8 @@ class Tools
 			return '';
 
 		// Split the replacements up into two arrays, for use with str_replace.
-		$find = array();
-		$replace = array();
+		$find = [];
+		$replace = [];
 
 		foreach ($replacements as $f => $r)
 		{

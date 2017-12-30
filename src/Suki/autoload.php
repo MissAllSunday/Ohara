@@ -45,7 +45,7 @@ class OharaAutoload
 		);
 
 		// Gotta register our main class.
-		$pref['namespaces']['Suki'] = array($sourcedir . '/ohara/src');
+		$pref['namespaces']['Suki'] = [$sourcedir . '/ohara/src'];
 
 		// And Pimple too.
 		$pref['namespaces']['Pimple'] = ($vendorDir . '/pimple/pimple/src');
@@ -72,14 +72,14 @@ class OharaAutoload
 		return $loader;
 	}
 
-	public static function parser($text, $replacements = array())
+	public static function parser($text, $replacements = [])
 	{
 		if (empty($text) || empty($replacements) || !is_array($replacements))
 			return '';
 
 		// Split the replacements up into two arrays, for use with str_replace.
-		$find = array();
-		$replace = array();
+		$find = [];
+		$replace = [];
 		foreach ($replacements as $f => $r)
 		{
 			$find[] = '{' . $f . '}';

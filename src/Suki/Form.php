@@ -4,7 +4,7 @@
  * @package Ohara helper class
  * @version 1.1
  * @author Jessica González <suki@missallsunday.com>
- * @copyright Copyright (c) 2016, Jessica González
+ * @copyright Copyright (c) 2018, Jessica González
  * @license http://www.mozilla.org/MPL/2.0/
  */
 
@@ -12,13 +12,13 @@ namespace Suki;
 
 class Form
 {
-	public $elements = array();
+	public $elements = [];
 	protected $_buffer = '';
 	protected $_app;
 	protected $_options = array('name' => '',);
 	protected $_counter = 0;
 
-	public function __construct($app)
+	public function __construct(Suki\Ohara $app)
 	{
 		$this->_app = $app;
 	}
