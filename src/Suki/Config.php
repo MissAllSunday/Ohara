@@ -15,7 +15,7 @@ class Config
 	protected $_config = [];
 	protected $_app;
 
-	public function __construct(Suki\Ohara $app)
+	public function __construct(Ohara $app)
 	{
 		$this->_app = $app;
 	}
@@ -78,7 +78,7 @@ class Config
 	 * @param array $values an array of values to be inserted, it follows a name => value format
 	 * @return array the full modified config array. An empty array if the process couldn't be performed.
 	 */
-	public function put($values = array())
+	public function put($values = [])
 	{
 		// The usual checks.
 		if (empty($values) || !$this->_app->name)

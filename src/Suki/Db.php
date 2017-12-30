@@ -27,7 +27,7 @@ class Db
 	protected $_schema;
 	protected $_keys;
 
-	public function __construct(Suki\Ohara $app)
+	public function __construct(Ohara $app)
 	{
 		$this->_app = $app;
 
@@ -125,7 +125,7 @@ class Db
 	 * @param string $column The column name, if left empty and $this->_schema[$table] is defined, it will use the first column on it.
 	 * @return void
 	 */
-	public function update($ids = array(), $params = array(), $table = '', $column = '')
+	public function update($ids = [], $params = [], $table = '', $column = '')
 	{
 		global $smcFunc;
 

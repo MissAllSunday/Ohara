@@ -18,7 +18,7 @@ class Tools
 		'alphanumeric' => '[:alnum:]',
 	);
 
-	public function __construct(Suki\Ohara $app)
+	public function __construct(Ohara $app)
 	{
 		$this->_app = $app;
 	}
@@ -55,7 +55,7 @@ class Tools
 	 * @access public
 	 * @return boolean whether or not the data was encoded and outputted
 	 */
-	public function jsonResponse($data = array())
+	public function jsonResponse($data = [])
 	{
 		global $db_show_debug;
 
@@ -161,13 +161,14 @@ class Tools
 	 * @param int  $log the log used, either 1024 or 1000.
 	 * @return string
 	 */
-	public function formatBytes($bytes, $showUnits = false, $log = 1024)
+	public function formatBytes($bytes, $showUnits = false, $log = 1024): string
 	{
 		$units = array('B', 'KB', 'MB', 'GB', 'TB');
 		$bytes = max($bytes, 0);
 		$pow = floor(($bytes ? log($bytes) : 0) / log($log));
 		$pow = min($pow, count($units) - 1);
 		$bytes /= (1 << (10 * $pow));
+
 		return round($bytes, 2) . ($showUnits ? ' ' . $units[$pow] : '');
 	}
 
@@ -181,7 +182,7 @@ class Tools
 	 * - message array Uses Suki\Data::setUpdate() an array with 2 values, the first one array[0] is the message "key", the second array[1] is the "message".
 	 * @return void
 	 */
-	public function redirect($url, $options = array())
+	public function redirect($url, $options = [])
 	{
 		global $context;
 

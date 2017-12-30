@@ -18,12 +18,12 @@ class Form
 	protected $_options = array('name' => '',);
 	protected $_counter = 0;
 
-	public function __construct(Suki\Ohara $app)
+	public function __construct(Ohara $app)
 	{
 		$this->_app = $app;
 	}
 
-	public function setOptions($options = array())
+	public function setOptions($options = [])
 	{
 		global $context;
 
@@ -52,7 +52,7 @@ class Form
 		return !empty($id) ? $this->elements[$id] : $this->elements;
 	}
 
-	public function modifyElement($id = 0, $data = array())
+	public function modifyElement($id = 0, $data = [])
 	{
 		if (empty($id) || empty($data) || empty($this->elements[$id]))
 			return false;
@@ -71,7 +71,7 @@ class Form
 		$param['desc']  = !empty($param['fullDesc']) ? $param['fullDesc'] : $this->setText($param['name'] .'_sub');
 	}
 
-	public function addSelect($param = array())
+	public function addSelect($param = [])
 	{
 		// Kinda needs this...
 		if (empty($param) || empty($param['name']))
@@ -88,7 +88,7 @@ class Form
 		return $this->addElement($param);
 	}
 
-	public function addCheckBox($param = array())
+	public function addCheckBox($param = [])
 	{
 		// Kinda needs this...
 		if (empty($param) || empty($param['name']))
@@ -104,7 +104,7 @@ class Form
 		return $this->addElement($param);
 	}
 
-	public function addText($param = array())
+	public function addText($param = [])
 	{
 		// Kinda needs this...
 		if (empty($param) || empty($param['name']))
@@ -120,7 +120,7 @@ class Form
 		return $this->addElement($param);
 	}
 
-	public function addTextArea($param = array())
+	public function addTextArea($param = [])
 	{
 		// Kinda needs this...
 		if (empty($param) || empty($param['name']))
@@ -156,7 +156,7 @@ class Form
 		return $this->addElement($param);
 	}
 
-	public function addHTML($param = array())
+	public function addHTML($param = [])
 	{
 		// Kinda needs this...
 		if (empty($param) || empty($param['name']))
@@ -169,7 +169,7 @@ class Form
 		return $this->addElement($param);
 	}
 
-	public function addButton($param = array())
+	public function addButton($param = [])
 	{
 		// Kinda needs this...
 		if (empty($param) || empty($param['name']))
@@ -182,7 +182,7 @@ class Form
 		return $this->addElement($param);
 	}
 
-	public function addSection($param = array())
+	public function addSection($param = [])
 	{
 		// Kinda needs this...
 		if (empty($param) || empty($param['name']))

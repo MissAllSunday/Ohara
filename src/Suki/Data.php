@@ -12,7 +12,7 @@ namespace Suki;
 
 class Data
 {
-	public function __construct(Suki\Ohara $app)
+	public function __construct(Ohara $app)
 	{
 		$this->_app = $app;
 	}
@@ -50,7 +50,7 @@ class Data
 	 * @access public
 	 * @return mixed false on fail array.
 	 */
-	public function put($data = array())
+	public function put($data = [])
 	{
 		if (empty($data))
 			return false;
