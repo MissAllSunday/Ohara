@@ -104,9 +104,9 @@ class Tools
 	 * @access public
 	 * @param string $text The raw text.
 	 * @param array $replacements a key => value array containing all tokens to be replaced.
-	 * @return string|bool
+	 * @return string
 	 */
-	public function parser($text, $replacements = array())
+	public function parser($text, $replacements = []): string
 	{
 		global $context;
 
