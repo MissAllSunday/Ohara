@@ -4,7 +4,7 @@
  * @package Ohara helper class
  * @version 1.1
  * @author Jessica González <suki@missallsunday.com>
- * @copyright Copyright (c) 2016, Jessica González
+ * @copyright Copyright (c) 2018, Jessica González
  * @license http://www.mozilla.org/MPL/2.0/
  */
 
@@ -27,7 +27,7 @@ class Db
 	protected $_schema;
 	protected $_keys;
 
-	public function __construct($app)
+	public function __construct(Suki\Ohara $app)
 	{
 		$this->_app = $app;
 
@@ -85,7 +85,7 @@ class Db
 	public function read($params, $data, $key = false, $single = false)
 	{
 		global $smcFunc;
-		$dataResult = array();
+		$dataResult = [];
 		$query = $smcFunc['db_query']('', '
 			SELECT ' . $params['rows'] .'
 			FROM {db_prefix}' . $params['table'] .'

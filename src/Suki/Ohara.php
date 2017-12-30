@@ -4,7 +4,7 @@
  * @package Ohara helper class
  * @version 1.1
  * @author Jessica González <suki@missallsunday.com>
- * @copyright Copyright (c) 2016, Jessica González
+ * @copyright Copyright (c) 2018, Jessica González
  * @license http://www.mozilla.org/MPL/2.0/
  */
 
@@ -31,7 +31,7 @@ class Ohara extends \Pimple\Container
 	 * @access protected
 	 * @var array
 	 */
-	public $text = array();
+	public $text = [];
 
 	public $useConfig = false;
 
@@ -62,7 +62,7 @@ class Ohara extends \Pimple\Container
 
 	 * @return string
 	 */
-	public function getName()
+	public function getName(): string
 	{
 		return $this->name;
 	}
@@ -137,7 +137,7 @@ class Ohara extends \Pimple\Container
 				));
 
 			else
-				$overwriteHooks[$hook] = array();
+				$overwriteHooks[$hook] = [];
 
 			// Set some default values.
 			$defaultValues = array(
@@ -223,7 +223,7 @@ class Ohara extends \Pimple\Container
 	 * @access public
 	 * @return boolean
 	 */
-	public function enable($var)
+	public function enable($var): bool
 	{
 		global $modSettings;
 

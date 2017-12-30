@@ -5,7 +5,7 @@ A helper class to be used by SMF modifications (Mods).
 
 #### To be able to use this helper class you need to follow some requirements:
 
-- Needs PHP 5.3 or higher. SMF 2.1.
+- Needs PHP 5.6 or higher. SMF 2.1.
 - Include it or require it on your own file. You can also use composer:
 
  ```json
@@ -33,7 +33,7 @@ public static $name = __CLASS__;
 
 $name is the unique identifier for your main class. Can be any name but usually __CLASS__ fits quite well.
 
-- You need to call $this->setRegistry(), ideally on your __construct method to register your class, have access to several SMF's global variables, create Pimple's service and execute any "on-the-fly" hook declarations.
+- You need to call $this->setRegistry(), ideally on your construct method to register your class, have access to several SMF's global variables, create Pimple's service and execute any "on-the-fly" hook declarations.
 
   ```php
 		global $sourcedir, $scripturl;
@@ -42,14 +42,8 @@ $name is the unique identifier for your main class. Can be any name but usually 
 		$this->scriptUrl = $scripturl;
 		$this->boardDir = $boarddir;
 		$this->boardUrl = $boardurl;
-
-		// Create the services.
 		$this->set();
-
-		// Get this mod's config file.
 		$this['config']->getConfig();
-
-		// Any runtime hooks?
 		$this->createHooks();
  ```
 
@@ -62,7 +56,7 @@ $name is the unique identifier for your main class. Can be any name but usually 
 	$modSetting['Mod_something'];
  ```
 
-Where Mod is the actual name of your class (Ohara uses magic constant __CLASS__ rather than __METHOD__).
+Where Mod is whatever you used in your $name property.
 
 To be able to use a setting you simply call $this->setting('something'); or $this->text('something'); for a text string. Both values return false if there isn't a $modSetting or $txt associated with it.
 
