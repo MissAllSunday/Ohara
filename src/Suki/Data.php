@@ -90,7 +90,7 @@ class Data
 	 * @access public
 	 * @return array
 	 */
-	public function getAll($type = 'request')
+	public function getAll($type = 'request'): array
 	{
 		$this->setData($type);
 
@@ -104,7 +104,7 @@ class Data
 	 * @access public
 	 * @return boolean
 	 */
-	public function validate($var)
+	public function validate($var): bool
 	{
 		// $var should always be a string, it should be the name of the var you want to validate, not the actual var!
 		if (!is_string($var))

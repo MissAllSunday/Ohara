@@ -26,7 +26,7 @@ class Config
 	 * @access public
 	 * @return array
 	 */
-	public function getConfig()
+	public function getConfig(): array
 	{
 		global $txt, $modSettings;
 

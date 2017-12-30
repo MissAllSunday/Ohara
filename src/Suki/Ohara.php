@@ -62,7 +62,7 @@ class Ohara extends \Pimple\Container
 
 	 * @return string
 	 */
-	public function getName()
+	public function getName(): string
 	{
 		return $this->name;
 	}
@@ -223,7 +223,7 @@ class Ohara extends \Pimple\Container
 	 * @access public
 	 * @return boolean
 	 */
-	public function enable($var)
+	public function enable($var): bool
 	{
 		global $modSettings;
 
