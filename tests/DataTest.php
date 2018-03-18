@@ -20,4 +20,13 @@ class DataTest extends \PHPUnit_Framework_TestCase
 		$t = new OharaDummyData;
 		$this->_ohara = $t['data'];
 	}
+
+	public function testSetData()
+	{
+		$lol = $_REQUEST['lol'] = 'lol';
+
+		$this->_ohara->setData();
+
+		$this->assertEquals($lol, $_REQUEST['lol']);
+	}
 }
