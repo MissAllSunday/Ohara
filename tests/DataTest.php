@@ -4,7 +4,7 @@ use Suki\Ohara;
 
 class OharaDummyData extends \Suki\Ohara
 {
-	public $name = 'OharaDummyTools';
+	public $name = 'OharaDummyData';
 	public $useConfig = false;
 
 	public function __construct()
@@ -19,20 +19,5 @@ class DataTest extends \PHPUnit_Framework_TestCase
 	{
 		$t = new OharaDummyData;
 		$this->_ohara = $t['data'];
-	}
-
-	public function testSetData()
-	{
-		$lol = $_REQUEST['lol'] = 'lol';
-
-		$this->assertEquals($lol, $this->_ohara->get('lol'));
-	}
-
-	public function testPutData()
-	{
-		$lol = $_REQUEST['lol'] = 'lol';
-		$this->_ohara->put($lol);
-
-		$this->assertEquals($lol, $this->_ohara->get('lol'));
 	}
 }
