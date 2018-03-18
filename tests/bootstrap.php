@@ -11,12 +11,12 @@ global $boarddir, $boardurl, $context, $txt, $smcFunc;
 $smcFunc['htmltrim'] = function($value)
 {
 	return $value;
-}
+};
 
 $smcFunc['htmlspecialchars'] = function($value)
 {
 	return $value;
-}
+};
 
 // Mock functions
 function loadLanguage($template_name){}
