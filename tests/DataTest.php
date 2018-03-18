@@ -13,7 +13,7 @@ class OharaDummyData extends \Suki\Ohara
 	}
 }
 
-class ToolsTest extends \PHPUnit_Framework_TestCase
+class DataTest extends \PHPUnit_Framework_TestCase
 {
 	protected function setUp()
 	{
