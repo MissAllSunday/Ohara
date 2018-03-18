@@ -28,7 +28,7 @@ class ToolsTest extends \PHPUnit_Framework_TestCase
 		$this->assertEquals($lol, $this->_ohara->get('lol'));
 	}
 
-	public functiontestPutData()
+	public function testPutData()
 	{
 		$lol = $_REQUEST['lol'] = 'lol';
 		$this->_ohara->put($lol);
