@@ -156,7 +156,7 @@ class Data
 	 * @param string $key The unique identifier for your message
 	 * @param mixed $message ideally to store a message but can be used to store any type of variable
 	 * @access public
-	 * @return void|boolean
+	 * @return boolean
 	 */
 	public function setUpdate($key, $message)
 	{
@@ -169,7 +169,7 @@ class Data
 			return false;
 
 		// Store it! or overwrite it!
-		$_SESSION[$this->_app->name]['update'][$key] = $this->sanitize($message);
+		return $_SESSION[$this->_app->name]['update'][$key] = $this->sanitize($message);
 	}
 
 	/**
@@ -214,7 +214,7 @@ class Data
 	 * @param string $key The unique identifier for your message. No key means all messages will be cleaned.
 	 * @access public
 	 */
-	public function cleanUpdate($key = false)
+	public function cleanUpdate($key = '')
 	{
 		// No key means you want to clean em all.
 		if (empty($key))
