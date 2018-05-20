@@ -5,7 +5,18 @@ define('SMF', true);
 
 // mock globals used by SMF
 global $sourcedir, $scripturl, $modSettings;
-global $boarddir, $boardurl, $context, $txt;
+global $boarddir, $boardurl, $context, $txt, $smcFunc;
+
+// Function DB
+$smcFunc['htmltrim'] = function($value)
+{
+	return $value;
+};
+
+$smcFunc['htmlspecialchars'] = function($value)
+{
+	return $value;
+};
 
 // Mock functions
 function loadLanguage($template_name){}

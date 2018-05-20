@@ -15,6 +15,9 @@ class Data
 	public function __construct(Ohara $app)
 	{
 		$this->_app = $app;
+
+		// Initial set
+		$this->setData();
 	}
 
 	/**
