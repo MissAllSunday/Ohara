@@ -15,7 +15,7 @@ class Db
 	protected $_app;
 
 	/**
-	 * Property for specifiying your tables, columns and types:
+	 * Property for specifying your tables, columns and types:
 	 * 'table1' => array(
 	 *	'column1' => 'type',
 	 *	'column2' => 'int',
@@ -58,7 +58,7 @@ class Db
 		if (empty($this->_schema[$table]))
 			return false;
 
-		// Now check the data, perhaps I should check that the columns does match the columns declared for this table but i'm lazy...
+		// Now check the data, perhaps I should check that the columns does match the columns declared for this table but I'm lazy...
 		if (empty($data))
 			return false;
 
@@ -119,11 +119,11 @@ class Db
 	 * Updates data in x table.
 	 * Uses {@link $_schema}
 	 * @access public
-	 * @param array $ids An array of ids to check againts, can also use an int.
-	 * @param array $params An array of params (ohrly???) $column => $value pair.
+	 * @param array $ids An array of ids to check against, can also use an int.
+	 * @param array $params An array of params (oh rly???) $column => $value pair.
 	 * @param string $table The table name, if left empty and $this->_schema is defined, it will use the first table on it.
 	 * @param string $column The column name, if left empty and $this->_schema[$table] is defined, it will use the first column on it.
-	 * @return void
+	 * @return mixed
 	 */
 	public function update($ids = [], $params = [], $table = '', $column = '')
 	{
@@ -170,11 +170,10 @@ class Db
 	/**
 	 * Deletes an entry from X table.
 	 * @access public
-	 * @param mixed
-	 * @param string $table The table name.
+	 * @param mixed $value The table name.
 	 * @param string $table The table name, if left empty and $this->_schema is defined, it will use the first table on it.
 	 * @param string $column The column name, if left empty and $this->_schema[$table] is defined, it will use the first column on it.
-	 * @return void
+	 * @return mixed
 	 */
 	public function delete($value, $table = '', $column = '')
 	{

@@ -180,7 +180,7 @@ class Tools
 	 * - token string If defined, sets a token using the string given, if no string is provided, uses a generic name created by Suki\Ohara::$name and appending "_re" to it.
 	 * - tokenType string createToken needs a type, post, get or request, defaults to get.
 	 * - message array Uses Suki\Data::setUpdate() an array with 2 values, the first one array[0] is the message "key", the second array[1] is the "message".
-	 * @return void
+	 * @return mixed
 	 */
 	public function redirect($url, $options = [])
 	{
