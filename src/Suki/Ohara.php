@@ -163,7 +163,7 @@ class Ohara extends \Pimple\Container
 	 * Uses a few specific text strings: disable_hook_title, disable_hook_desc, disable_hook and disable_hook_sub the only required text string is disable_hook.
 	 * @param array $config_vars Passed by reference, a regular SMF's config_vars array.
 	 * @access public
-	 * @return void
+	 * @return boolean
 	 */
 	public function disableHooks(&$config_vars)
 	{
@@ -194,6 +194,8 @@ class Ohara extends \Pimple\Container
 				'subtext' => ($this->text('disable_hook_sub') ? $this['tools']->parser($this->text('disable_hook_'. $hook .'_sub'), array('hook' => $hook)) : '')
 			);
 		}
+
+		return true;
 	}
 
 	/**

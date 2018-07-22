@@ -20,7 +20,7 @@ $smcFunc['htmlspecialchars'] = function($value)
 
 // Mock functions
 function loadLanguage($template_name){}
-function log_error(){}
+function log_error($string){}
 function add_integration_function(){}
 function remove_integration_function(){}
 function smf_json_decode($s, $array = true)

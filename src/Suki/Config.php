@@ -69,7 +69,7 @@ class Config
 		if (!$this->_config)
 			$this->getConfig();
 
-		return $name ? (isset($this->_config['_'. $name]) ? $this->_config['_'. $name] : false) : $this->_config;
+		return $name ? (isset($this->_config['_'. $name]) ? $this->_config['_'. $name] : []) : $this->_config;
 	}
 
 	/**
