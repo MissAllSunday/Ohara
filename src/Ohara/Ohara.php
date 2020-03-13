@@ -1,14 +1,13 @@
 <?php
 
+declare(strict_types=1);
+
 /**
- * @package Ohara helper class
- * @version 1.1
- * @author Jessica González <suki@missallsunday.com>
- * @copyright Copyright (c) 2018, Jessica González
  * @license http://www.mozilla.org/MPL/2.0/
  */
 
-namespace Suki;
+namespace Ohara;
+
 use Pimple\Container;
 
 /**
@@ -16,7 +15,7 @@ use Pimple\Container;
  * @package Ohara helper class
  * @subpackage classes
  */
-class Ohara extends \Pimple\Container
+class Ohara
 {
 	/**
 	 * The main identifier for the class extending Ohara, needs to be re-defined by each extending class
@@ -37,22 +36,23 @@ class Ohara extends \Pimple\Container
 
 	protected static $loader;
 
-	protected $_services = array(
+	protected $_services = [
 		'tools',
 		'form',
 		'config',
 		'loader',
 		'data',
 		'db',
-	);
+	];
 
-	protected function set()
+	protected function set(): void
 	{
 		foreach($this->_services as $s)
 			$this[$s] = function ($c) use ($s)
 			{
 				// Build the right namespace.
-				$call = __NAMESPACE__ .'\\'. ucfirst($s);
+				$call = __NAMESPACE__ . '\\' . ucfirst($s);
+
 				return new $call($c);
 			};
 	}
@@ -60,7 +60,6 @@ class Ohara extends \Pimple\Container
 	/**
 	 * Getter for {@link $name} property.
 
-	 * @return string
 	 */
 	public function getName(): string
 	{
@@ -72,9 +71,8 @@ class Ohara extends \Pimple\Container
 	 * Needs to be called by any class extending this class, preferable on a __construct method but can be called when/where necessary.
 	 * Calls {@link createHooks()} if there is any runtime hook.
 	 * @access public
-	 * @return void
 	 */
-	public function setRegistry()
+	public function setRegistry(): void
 	{
 		global $sourcedir, $scripturl;
 		global $boarddir, $boardurl;
@@ -109,7 +107,7 @@ class Ohara extends \Pimple\Container
 	 * Takes each defined hook in {@link $_availableHooks} and tries to add the relevant data for each hook
 	 * @access public
 	 */
-	public function createHooks()
+	public function createHooks(): void
 	{
 		global $context;
 
@@ -118,7 +116,7 @@ class Ohara extends \Pimple\Container
 		$overwriteHooks = $this['config']->get('overwriteHooks');
 
 		// Don't execute on uninstall.
-		if (!empty($context['uninstalling']) || $this['data']->get('sa') == 'uninstall2' || !$hooks)
+		if (!empty($context['uninstalling']) || 'uninstall2' == $this['data']->get('sa') || !$hooks)
 			return;
 
 		foreach ($hooks as $hook => $hook_name)
@@ -129,30 +127,30 @@ class Ohara extends \Pimple\Container
 
 			// Gotta replace our tokens.
 			if ($overwriteHooks && !empty($overwriteHooks[$hook]))
-				$overwriteHooks[$hook]['file'] = $this['tools']->parser($overwriteHooks[$hook]['file'], array(
+				$overwriteHooks[$hook]['file'] = $this['tools']->parser($overwriteHooks[$hook]['file'], [
 					'$sourcedir' => $this->sourceDir,
 					'$scripturl' => $this->scriptUrl,
 					'$boarddir' => $this->boardDir,
 					'$boardurl' => $this->boardUrl,
-				));
+				]);
 
 			else
 				$overwriteHooks[$hook] = [];
 
 			// Set some default values.
-			$defaultValues = array(
+			$defaultValues = [
 				'hookName' => $hook_name,
-				'func' => $this->name .'::add'. ucfirst($hook),
+				'func' => $this->name . '::add' . ucfirst($hook),
 				'permanent' => false,
-				'file' => '$sourcedir/'. $this->name .'.php',
+				'file' => '$sourcedir/' . $this->name . '.php',
 				'object' => true,
-			);
+			];
 
 			// You might or might not want to overwrite this...
 			extract(array_merge($defaultValues, $overwriteHooks[$hook]));
 
 			// You can also disable any hook used by this mod from the mod's admin settings if the mod has that feature.
-			$hookAction = ($this->enable('disable_hook_'. $hook_name) ? 'remove' : 'add') .'_integration_function';
+			$hookAction = ($this->enable('disable_hook_' . $hook_name) ? 'remove' : 'add') . '_integration_function';
 
 			$hookAction($hookName, $func, $permanent, $file, $object);
 		}
@@ -175,10 +173,10 @@ class Ohara extends \Pimple\Container
 
 		// A title and a description.
 		if ($this->text('disable_hook_title'))
-			$config_vars[] = array('title', 'Ohara_disableHooks_title', 'label' => $this['tools']->parser($this->text('disable_hook_title'), array('modname' => $this->name)));
+			$config_vars[] = ['title', 'Ohara_disableHooks_title', 'label' => $this['tools']->parser($this->text('disable_hook_title'), ['modname' => $this->name])];
 
 		if ($this->text('disable_hook_desc'))
-			$config_vars[] = array('desc', 'Ohara_disableHooks_desc', 'label' => $this['tools']->parser($this->text('disable_hook_desc'), array('modname' => $this->name)));
+			$config_vars[] = ['desc', 'Ohara_disableHooks_desc', 'label' => $this['tools']->parser($this->text('disable_hook_desc'), ['modname' => $this->name])];
 
 		foreach ($hooks as $hook => $hook_name)
 		{
@@ -187,12 +185,12 @@ class Ohara extends \Pimple\Container
 				continue;
 
 			// Gotta "protect" the admin and settings hooks.
-			$config_vars[] = array(
+			$config_vars[] = [
 				'check',
-				$this->name .'_disable_hook_'. $hook_name, 'disabled' => (strpos($hook_name, 'admin') !== false || strpos($hook_name, 'setting') !== false) ? true : false,
-				'label' => $this['tools']->parser($this->text('disable_hook'), array('hook' => $hook_name)),
-				'subtext' => ($this->text('disable_hook_sub') ? $this['tools']->parser($this->text('disable_hook_'. $hook .'_sub'), array('hook' => $hook)) : '')
-			);
+				$this->name . '_disable_hook_' . $hook_name, 'disabled' => (false !== strpos($hook_name, 'admin') || false !== strpos($hook_name, 'setting')) ? true : false,
+				'label' => $this['tools']->parser($this->text('disable_hook'), ['hook' => $hook_name]),
+				'subtext' => ($this->text('disable_hook_sub') ? $this['tools']->parser($this->text('disable_hook_' . $hook . '_sub'), ['hook' => $hook]) : '')
+			];
 		}
 
 		return true;
@@ -215,7 +213,7 @@ class Ohara extends \Pimple\Container
 		// Does nothing if the file is already loaded.
 		loadLanguage($this->name);
 
-		return !empty($txt[$this->name .'_'. $var]) ? $txt[$this->name .'_'. $var] : false;
+		return !empty($txt[$this->name . '_' . $var]) ? $txt[$this->name . '_' . $var] : false;
 	}
 
 	/**
@@ -233,10 +231,10 @@ class Ohara extends \Pimple\Container
 		if (empty($this->name) || empty($var))
 			return false;
 
-		if (!empty($modSettings[$this->name .'_'. $var]))
+		if (!empty($modSettings[$this->name . '_' . $var]))
 			return true;
 
-		else
+
 			return false;
 	}
 
@@ -254,9 +252,9 @@ class Ohara extends \Pimple\Container
 		global $modSettings;
 
 		if (true == $this->enable($var))
-			return $modSettings[$this->name .'_'. $var];
+			return $modSettings[$this->name . '_' . $var];
 
-		else
+
 			return $default;
 	}
 
@@ -277,7 +275,7 @@ class Ohara extends \Pimple\Container
 		if (isset($modSettings[$var]))
 			return $modSettings[$var];
 
-		else
+
 			return $default;
 	}
 
@@ -286,9 +284,8 @@ class Ohara extends \Pimple\Container
 	 * Uses config('actions') to determinate the name and file for the action, if no data is given, {@link $name} will be used
 	 * @access public
 	 * @param array $actions An array containing all current registered SMF actions at the moment of this method execution
-	 * @return void
 	 */
-	public function addActions(&$actions)
+	public function addActions(&$actions): void
 	{
 		// This needs to be set and extended by someone else!
 		$hooks = $this['config']->get('availableHooks');
@@ -306,19 +303,19 @@ class Ohara extends \Pimple\Container
 				$counter++;
 
 				$name = !empty($a['name']) ? $a['name'] : $this->name . $counter;
-				$file = !empty($a['file']) ? $a['file'] : $this->name .'.php';
-				$call = !empty($a['callable']) ? $a['callable'] : $this->name .'::call#';
+				$file = !empty($a['file']) ? $a['file'] : $this->name . '.php';
+				$call = !empty($a['callable']) ? $a['callable'] : $this->name . '::call#';
 
-				$actions[$name] = array($file, $call);
+				$actions[$name] = [$file, $call];
 			}
 
 		else
 		{
 			$name = !empty($oActions['name']) ? $oActions['name'] : $this->name;
-			$file = !empty($oActions['file']) ? $oActions['file'] : $this->name .'.php';
-			$call = !empty($oActions['callable']) ? $oActions['callable'] : $this->name .'::call#';
+			$file = !empty($oActions['file']) ? $oActions['file'] : $this->name . '.php';
+			$call = !empty($oActions['callable']) ? $oActions['callable'] : $this->name . '::call#';
 
-			$actions[$name] = array($file, $call);
+			$actions[$name] = [$file, $call];
 		}
 	}
 
@@ -327,9 +324,8 @@ class Ohara extends \Pimple\Container
 	 * Uses {@link $_modHooks} to determinate if a link should be added
 	 * Uses a predefined $txt string $this->text('modCredits')
 	 * @access public
-	 * @return void
 	 */
-	public function addCredits()
+	public function addCredits(): void
 	{
 		global $context;
 
@@ -348,9 +344,8 @@ class Ohara extends \Pimple\Container
 	 * Uses $config['simpleSettings'] to determinate the number of settings to add.
 	 * Mods can still overwrite this method to add more complex settings.
 	 * @access public
-	 * @return void
 	 */
-	public function addSimpleSettings(&$config_vars)
+	public function addSimpleSettings(&$config_vars): void
 	{
 		// This needs to be set and extended by someone else!
 		$hooks = $this['config']->get('availableHooks');
@@ -373,11 +368,11 @@ class Ohara extends \Pimple\Container
 
 				// The rest.
 				else
-					$config_vars[] = array($s['type'], $this->name .'_'. $s['name'], 'subtext' => $this->text($s['name'] .'_sub'));
+					$config_vars[] = [$s['type'], $this->name . '_' . $s['name'], 'subtext' => $this->text($s['name'] . '_sub')];
 			}
 	}
 
-	public function addPermissions(&$permissionGroups, &$permissionList)
+	public function addPermissions(&$permissionGroups, &$permissionList): void
 	{
 		// This needs to be set and extended by someone else!
 		$hooks = $this['config']->get('availableHooks');
@@ -392,15 +387,15 @@ class Ohara extends \Pimple\Container
 		// We gotta load our language file.
 		loadLanguage($langFile);
 
-		$permissionGroups['membergroup']['simple'] = array($identifier .'_per_simple');
-		$permissionGroups['membergroup']['classic'] = array($identifier .'_per_classic');
+		$permissionGroups['membergroup']['simple'] = [$identifier . '_per_simple'];
+		$permissionGroups['membergroup']['classic'] = [$identifier . '_per_classic'];
 
 		if (!empty($customPerm['perms']) && is_array($customPerm['perms']))
 			foreach ($customPerm['perms'] as $p)
-				$permissionList['membergroup'][$identifier .'_'. $p] = array(
-				false,
-				$identifier .'_per_classic',
-				$identifier .'_per_simple');
+				$permissionList['membergroup'][$identifier . '_' . $p] = [
+					false,
+					$identifier . '_per_classic',
+					$identifier . '_per_simple'];
 	}
 
 	/**
@@ -408,9 +403,8 @@ class Ohara extends \Pimple\Container
 	 * Used to load a language to properly display any help txt strings from mods that adds new permissions via hooks
 	 * Uses {@link $_modHooks} if the mod author wants to specify a custom file name, if not, it defaults to {@link $name}
 	 * @access public
-	 * @return void
 	 */
-	public function addHelpAdmin()
+	public function addHelpAdmin(): void
 	{
 		// This needs to be set and extended by someone else!
 		$hooks = $this['config']->get('availableHooks');
@@ -429,7 +423,6 @@ class Ohara extends \Pimple\Container
 	 * Magic method to check properties.
 	 * uses variable variables.
 	 * @access public
-	 * @param string $string The var name to check
 	 * @return bool
 	 */
 	public function __isset($name)

@@ -1,0 +1,30 @@
+parameters:
+level: 5
+bootstrap: tests/bootstrap.php
+paths:
+- src
+ignoreErrors:
+- '/Function allowedTo not found./'
+- '/Function prepareDBSettingContext not found./'
+- '/Function loadGeneralSettingParameters not found./'
+- '/Function checkSession not found./'
+- '/Function allowedTo not found./'
+- '/Function saveDBSettings not found./'
+- '/Function fatal_lang_error not found./'
+- '/Function addInlineJavascript not found./'
+- '/Function loadJavascriptFile not found./'
+- '/Function JavaScriptEscape not found./'
+- '/Function redirectexit not found./'
+- '/Function writeLog not found./'
+- '/Function loadCSSFile not found./'
+- '/Function is_not_guest not found./'
+- '/Function cache_put_data not found./'
+- '/Function cache_get_data not found./'
+- '/Function loadtemplate not found./'
+- '/Function constructPageIndex not found./'
+- '/Function createList not found./'
+- '/Function updateMemberData not found./'
+- '/Function parse_bbc not found./'
+- '/Function un_htmlspecialchars not found./'
+autoload_files:
+- %currentWorkingDirectory%/vendor/autoload.php

@@ -4,7 +4,7 @@
 	"description": "Helper class for SMF mods",
 	"keywords": ["SMF","modifications"],
 	"homepage": "http://github.com/MissAllSunday/Ohara",
-	"license": "MPL-2.0",
+	"license": ["MIT"],
 	"authors": [
 		{
 			"name": "Jessica González",
@@ -14,16 +14,32 @@
 		}
 	],
 	"require": {
-		"php": ">=7.0",
-		"composer/installers": "~1.0",
-		"pimple/pimple": "~3.0"
-	},
+		"php": ">=7.3.0",
+		"league/container": "^3.3",
+      	"ext-json": "*"
+    },
 	"require-dev": {
-		"phpunit/phpunit": "~4"
+		"phpunit/phpunit": "^8",
+		"friendsofphp/php-cs-fixer": "^2.16",
+		"phpstan/phpstan": "^0.12.8"
 	},
 	"autoload": {
 		"psr-0": {
-			"Suki": "src/"
+			"Ohara": "src/"
 		}
+	},
+	"scripts": {
+		"lint": "php-cs-fixer fix --verbose --show-progress=estimating",
+		"lint:check": [
+			"php-cs-fixer fix --dry-run --verbose --show-progress=estimating"
+		],
+		"phpunit": "phpunit -c phpunit.xml.dist --bootstrap ./tests/bootstrap.php --testsuite Ohara",
+		"phpstan": "phpstan analyze",
+		"serve": "bin/server",
+		"test": [
+			"@lint:check",
+			"@phpunit",
+			"@phpstan"
+		]
 	}
 }

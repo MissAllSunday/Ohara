@@ -1,17 +1,20 @@
 <?php
 
-use Suki\Ohara;
+declare(strict_types=1);
 
-function mockGlobals()
+use Ohara\Ohara;
+
+function mockGlobals(): void
 {
 	global $modSettings;
 
 	$modSettings['_configOharaDummyConfig'] = '{"_availableHooks":{"memberContext":"integrate_member_context","generalSettings":"integrate_general_mod_settings","displayContext":"integrate_prepare_display_context","profile":"integrate_load_custom_profile_fields"}}';
 }
 
-class OharaDummyConfig extends \Suki\Ohara
+class OharaDummyConfig extends \Ohara\Ohara
 {
 	public $name = 'OharaDummyConfig';
+
 	public $useConfig = true;
 
 	public function __construct()
@@ -20,9 +23,9 @@ class OharaDummyConfig extends \Suki\Ohara
 	}
 }
 
-class ConfigTest extends \PHPUnit_Framework_TestCase
+class ConfigTest extends \PHPUnit\Framework\TestCase
 {
-	protected function setUp()
+	protected function setUp(): void
 	{
 		mockGlobals();
 		$t = new OharaDummyConfig;
@@ -33,7 +36,7 @@ class ConfigTest extends \PHPUnit_Framework_TestCase
 	{
 		if(is_array($a) && is_array($b))
 		{
-			if(count(array_diff(array_keys($a), array_keys($b))) > 0)
+			if(0 < count(array_diff(array_keys($a), array_keys($b))))
 				return false;
 
 			foreach($a as $k => $v)
@@ -43,33 +46,33 @@ class ConfigTest extends \PHPUnit_Framework_TestCase
 			return true;
 		}
 
-		else
+
 			return $a === $b;
 	}
 
-	public function testgetConfig()
+	public function testgetConfig(): void
 	{
 		$result = $this->_ohara->getConfig();
 
-		$this->assertTrue($this->similarArrays(array(
-			'_availableHooks' => array(
+		$this->assertTrue($this->similarArrays([
+			'_availableHooks' => [
 				'memberContext' => 'integrate_member_context',
 				'generalSettings' => 'integrate_general_mod_settings',
 				'displayContext' => 'integrate_prepare_display_context',
 				'profile' => 'integrate_load_custom_profile_fields',
-			),
-			), $result));
+			],
+		], $result));
 	}
 
-	public function testGet()
+	public function testGet(): void
 	{
 		$result = $this->_ohara->get('availableHooks');
 
-		$this->assertEquals(array(
+		$this->assertEquals([
 			'memberContext' => 'integrate_member_context',
 			'generalSettings' => 'integrate_general_mod_settings',
 			'displayContext' => 'integrate_prepare_display_context',
 			'profile' => 'integrate_load_custom_profile_fields',
-		), $result);
+		], $result);
 	}
 }

@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	backupGlobals="false"
-	colors="true"
-	verbose="true"
-	bootstrap="tests/bootstrap.php">
+		 backupGlobals="false"
+		 colors="true"
+		 verbose="true"
+		 bootstrap="tests/bootstrap.php">
 	<testsuites>
-		<testsuite name="Ohara Test Suite">
+		<testsuite name="Ohara">
 			<directory>./tests/</directory>
 		</testsuite>
 	</testsuites>

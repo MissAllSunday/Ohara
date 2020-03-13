@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 define('ROOT', __DIR__);
 define('SMF', true);
 
@@ -19,10 +21,10 @@ $smcFunc['htmlspecialchars'] = function($value)
 };
 
 // Mock functions
-function loadLanguage($template_name){}
-function log_error($string){}
-function add_integration_function(){}
-function remove_integration_function(){}
+function loadLanguage($template_name): void{}
+function log_error($string): void{}
+function add_integration_function(): void{}
+function remove_integration_function(): void{}
 function smf_json_decode($s, $array = true)
 {
 	return json_decode($s, $array);
@@ -31,13 +33,13 @@ function smf_json_decode($s, $array = true)
 $sourcedir = $scripturl = $boarddir = $boardurl = ROOT;
 
 // Mock some SMF arrays.
-$context = array(
+$context = [
 	'session_var' => 'foo',
 	'session_id' => 'baz',
-);
-$modSettings = array(
+];
+$modSettings = [
 	'CompressedOutput' => false,
-);
+];
 
 // Composer-Autoloader
 require_once "vendor/autoload.php";

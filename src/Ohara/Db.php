@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * @package Ohara helper class
  * @version 1.1
@@ -8,7 +10,7 @@
  * @license http://www.mozilla.org/MPL/2.0/
  */
 
-namespace Suki;
+namespace Ohara;
 
 class Db
 {
@@ -25,6 +27,7 @@ class Db
 	 * @var array
 	 */
 	protected $_schema;
+
 	protected $_keys;
 
 	public function __construct(Ohara $app)
@@ -86,15 +89,17 @@ class Db
 	{
 		global $smcFunc;
 		$dataResult = [];
-		$query = $smcFunc['db_query']('', '
-			SELECT ' . $params['rows'] .'
-			FROM {db_prefix}' . $params['table'] .'
-			'. (!empty($params['join']) ? 'LEFT JOIN '. $params['join'] : '') .'
-			'. (!empty($params['where']) ? 'WHERE '. $params['where'] : '') .'
-				'. (!empty($params['and']) ? 'AND '. $params['and'] : '') .'
-				'. (!empty($params['andTwo']) ? 'AND '. $params['andTwo'] : '') .'
-			'. (!empty($params['order']) ? 'ORDER BY ' . $params['order'] : '') .'
-			'. (!empty($params['limit']) ? 'LIMIT '. $params['limit'] : '') . '',
+		$query = $smcFunc['db_query'](
+			'',
+			'
+			SELECT ' . $params['rows'] . '
+			FROM {db_prefix}' . $params['table'] . '
+			' . (!empty($params['join']) ? 'LEFT JOIN ' . $params['join'] : '') . '
+			' . (!empty($params['where']) ? 'WHERE ' . $params['where'] : '') . '
+				' . (!empty($params['and']) ? 'AND ' . $params['and'] : '') . '
+				' . (!empty($params['andTwo']) ? 'AND ' . $params['andTwo'] : '') . '
+			' . (!empty($params['order']) ? 'ORDER BY ' . $params['order'] : '') . '
+			' . (!empty($params['limit']) ? 'LIMIT ' . $params['limit'] : '') . '',
 			$data
 		);
 
@@ -123,7 +128,6 @@ class Db
 	 * @param array $params An array of params (oh rly???) $column => $value pair.
 	 * @param string $table The table name, if left empty and $this->_schema is defined, it will use the first table on it.
 	 * @param string $column The column name, if left empty and $this->_schema[$table] is defined, it will use the first column on it.
-	 * @return mixed
 	 */
 	public function update($ids = [], $params = [], $table = '', $column = '')
 	{
@@ -155,15 +159,17 @@ class Db
 		$string = '';
 
 		foreach ($params as $column => $newValue)
-			$string .= $column .' = '. $newValue . ($newValue != end($params) ? ', ' : '');
+			$string .= $column . ' = ' . $newValue . ($newValue != end($params) ? ', ' : '');
 
-		return $smcFunc['db_query']('', '
+		return $smcFunc['db_query'](
+			'',
+			'
 			UPDATE {db_prefix}' . ($table) . '
-			SET '. ($string) .'
-			WHERE '. ($column) .' IN ({array_'. ($table[$column]) .':ids})',
-			array(
+			SET ' . ($string) . '
+			WHERE ' . ($column) . ' IN ({array_' . ($table[$column]) . ':ids})',
+			[
 				'ids' => $ids,
-			)
+			]
 		);
 	}
 
@@ -173,7 +179,6 @@ class Db
 	 * @param mixed $value The table name.
 	 * @param string $table The table name, if left empty and $this->_schema is defined, it will use the first table on it.
 	 * @param string $column The column name, if left empty and $this->_schema[$table] is defined, it will use the first column on it.
-	 * @return mixed
 	 */
 	public function delete($value, $table = '', $column = '')
 	{
@@ -185,6 +190,6 @@ class Db
 		// Perform.
 		return $smcFunc['db_query']('', '
 			DELETE FROM {db_prefix}' . ($table) . '
-			WHERE '. ($column) .' = '. ($value) .'', array());
+			WHERE ' . ($column) . ' = ' . ($value) . '', []);
 	}
 }

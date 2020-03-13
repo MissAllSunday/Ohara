@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * @package Ohara helper class
  * @version 1.1
@@ -8,15 +10,15 @@
  * @license http://www.mozilla.org/MPL/2.0/
  */
 
-namespace Suki;
+namespace Ohara;
 
 class Tools
 {
-	protected $_commaCases = array(
+	protected $_commaCases = [
 		'numeric' => '\d',
 		'alpha' => '[:alpha:]',
 		'alphanumeric' => '[:alnum:]',
-	);
+	];
 
 	public function __construct(Ohara $app)
 	{
@@ -38,13 +40,13 @@ class Tools
 		$pos = strpos($url, '//');
 
 		// Perhaps this is a schema less url? parse_url should detect schema less urls .___.
-		if (empty($parsed['scheme']) && strpos($url, '//') !== false)
+		if (empty($parsed['scheme']) && false !== strpos($url, '//'))
 			return $url;
 
-		elseif (empty($parsed['scheme']))
-			return 'http'. ($secure ? 's' : '') .'://'. $url;
+		if (empty($parsed['scheme']))
+			return 'http' . ($secure ? 's' : '') . '://' . $url;
 
-		else
+
 			return $url;
 	}
 
@@ -69,7 +71,7 @@ class Tools
 		// This is pretty simply, just encode the supplied data and be done with it.
 		$json = json_encode($data);
 
-		$result = json_last_error() == JSON_ERROR_NONE;
+		$result = JSON_ERROR_NONE == json_last_error();
 
 		if ($result)
 		{
@@ -104,7 +106,6 @@ class Tools
 	 * @access public
 	 * @param string $text The raw text.
 	 * @param array $replacements a key => value array containing all tokens to be replaced.
-	 * @return string
 	 */
 	public function parser($text, $replacements = []): string
 	{
@@ -120,7 +121,7 @@ class Tools
 		foreach ($replacements as $f => $r)
 		{
 			$find[] = '{' . $f . '}';
-			$replace[] = $r . ((strpos($f,'href') !== false) ? (';'. $context['session_var'] .'='. $context['session_id']) : '');
+			$replace[] = $r . ((false !== strpos($f, 'href')) ? (';' . $context['session_var'] . '=' . $context['session_id']) : '');
 		}
 
 		// Do the variable replacements.
@@ -144,12 +145,14 @@ class Tools
 		$t = isset($this->_commaCases[$type]) ? $this->_commaCases[$type] : $this->_commaCases['alphanumeric'];
 
 		return empty($string) ? false : implode($delimiter, array_filter(explode($delimiter, preg_replace(
-			array(
-				'/[^'. $t .',]/',
-				'/(?<='. $delimiter .')'. $delimiter .'+/',
-				'/^'. $delimiter .'+/',
-				'/'. $delimiter .'+$/'
-			), '', $string
+			[
+				'/[^' . $t . ',]/',
+				'/(?<=' . $delimiter . ')' . $delimiter . '+/',
+				'/^' . $delimiter . '+/',
+				'/' . $delimiter . '+$/'
+			],
+			'',
+			$string
 		))));
 	}
 
@@ -159,11 +162,10 @@ class Tools
 	 * @param string|int  $bytes A number of bytes.
 	 * @param bool $showUnits To show the unit symbol or not.
 	 * @param int  $log the log used, either 1024 or 1000.
-	 * @return string
 	 */
 	public function formatBytes($bytes, $showUnits = false, $log = 1024): string
 	{
-		$units = array('B', 'KB', 'MB', 'GB', 'TB');
+		$units = ['B', 'KB', 'MB', 'GB', 'TB'];
 		$bytes = max($bytes, 0);
 		$pow = floor(($bytes ? log($bytes) : 0) / log($log));
 		$pow = min($pow, count($units) - 1);
@@ -180,7 +182,6 @@ class Tools
 	 * - token string If defined, sets a token using the string given, if no string is provided, uses a generic name created by Suki\Ohara::$name and appending "_re" to it.
 	 * - tokenType string createToken needs a type, post, get or request, defaults to get.
 	 * - message array Uses Suki\Data::setUpdate() an array with 2 values, the first one array[0] is the message "key", the second array[1] is the "message".
-	 * @return mixed
 	 */
 	public function redirect($url, $options = [])
 	{
@@ -194,7 +195,7 @@ class Tools
 		if (!empty($options['token']))
 		{
 			// No name? why?
-			$name = !is_string($options['token']) ? ($this->_app->name .'_re') : $options['token'];
+			$name = !is_string($options['token']) ? ($this->_app->name . '_re') : $options['token'];
 
 			createToken($name, (!empty($options['tokenType']) ? $options['tokenType'] : 'get'));
 		}
@@ -204,6 +205,6 @@ class Tools
 			$this->_app['data']->setUpdate($options['message'][0], $options['message'][1]);
 
 		// Finally, set a call to redirectexit, append the session var if available.
-		return redirectexit($url .';'. (isset($context['session_var']) ? ($context['session_var'] .'='. $context['session_id']) : ''));
+		return redirectexit($url . ';' . (isset($context['session_var']) ? ($context['session_var'] . '=' . $context['session_id']) : ''));
 	}
 }

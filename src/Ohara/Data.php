@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * @package Ohara helper class
  * @version 1.1
@@ -8,7 +10,7 @@
  * @license http://www.mozilla.org/MPL/2.0/
  */
 
-namespace Suki;
+namespace Ohara;
 
 class Data
 {
@@ -32,14 +34,13 @@ class Data
 	 * can be called directly but its also called by Ohara::data()
 	 * @param string $type request, post or get. The name of the superblogal you want to fetch, defaults to request
 	 * @access public
-	 * @return void
 	 */
-	public function setData($type = 'request')
+	public function setData($type = 'request'): void
 	{
 		// Reset it.
 		$this->_request = false;
 
-		$types = array('request' => $_REQUEST, 'get' => $_GET, 'post' => $_POST);
+		$types = ['request' => $_REQUEST, 'get' => $_GET, 'post' => $_POST];
 
 		$typeSet = (empty($type) || !isset($types[$type])) ? $_REQUEST : $types[$type];
 		$this->_request = $this->sanitize($typeSet);
@@ -74,7 +75,6 @@ class Data
 	 * @param string $var the superglobal's key name you want to retrieve.
 	 * @param mixed $default The default value used if the setting doesn't exists.
 	 * @access public
-	 * @return mixed
 	 */
 	public function get($var = '', $default = null)
 	{
@@ -83,7 +83,7 @@ class Data
 
 		$this->setData();
 
-		return $this->validate($var) ? $this->_request[$var] : (!is_null($default) ? $default : false);
+		return $this->validate($var) ? $this->_request[$var] : (null !== $default ? $default : false);
 	}
 
 	/**
@@ -91,7 +91,6 @@ class Data
 	 * calls Suki\Data::sanitize() to properly clean up
 	 * @param string $type The type of superglobal you want to retrieve.
 	 * @access public
-	 * @return array
 	 */
 	public function getAll($type = 'request'): array
 	{
@@ -125,7 +124,6 @@ class Data
 	 * Treats any var as a string and cast it as an integer if necessary.
 	 * @param mixed $var The var you want to sanitize
 	 * @access public
-	 * @return mixed
 	 */
 	public function sanitize($var)
 	{
@@ -139,8 +137,8 @@ class Data
 			return $var;
 		}
 
-		else
-		{
+
+
 			$var = (string) $smcFunc['htmltrim']($smcFunc['htmlspecialchars']($var), ENT_QUOTES);
 
 			if (ctype_digit($var))
@@ -148,7 +146,7 @@ class Data
 
 			if (empty($var))
 				$var = false;
-		}
+
 
 		return $var;
 	}
@@ -180,7 +178,6 @@ class Data
 	 * calls Ohara::cleanUpdate() to delete the entry from $_SESSION
 	 * @param string $key The unique identifier for your message
 	 * @access public
-	 * @return mixed
 	 */
 	public function getUpdate($key)
 	{
@@ -217,7 +214,7 @@ class Data
 	 * @param string $key The unique identifier for your message. No key means all messages will be cleaned.
 	 * @access public
 	 */
-	public function cleanUpdate($key = '')
+	public function cleanUpdate($key = ''): void
 	{
 		// No key means you want to clean em all.
 		if (empty($key))

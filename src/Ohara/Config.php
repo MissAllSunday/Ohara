@@ -1,18 +1,18 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * @package Ohara helper class
- * @version 1.1
- * @author Jessica González <suki@missallsunday.com>
- * @copyright Copyright (c) 2018, Jessica González
  * @license http://www.mozilla.org/MPL/2.0/
  */
 
-namespace Suki;
+namespace Ohara;
 
 class Config
 {
 	protected $_config = [];
+
 	protected $_app;
 
 	public function __construct(Ohara $app)
@@ -24,21 +24,20 @@ class Config
 	 * Gets a mod's config settings, loads it and store it on {@link $_config}
 	 * Checks if a $modSettings key exists and tries to load the info from it, defaults to check for a json file.
 	 * @access public
-	 * @return array
 	 */
 	public function getConfig(): array
 	{
 		global $txt, $modSettings;
 
-		$file = $this->_app->boardDir .'/_config'. $this->_app->name .'.json';
+		$file = $this->_app->boardDir . '/_config' . $this->_app->name . '.json';
 
 		// Already loaded or does not use config?
 		if ($this->_config || !$this->_app->useConfig)
 			return $this->_config;
 
 		// Check for a $modSettings key first.
-		if (!empty($modSettings['_config'. $this->_app->name]))
-			return $this->_config = smf_json_decode($modSettings['_config'. $this->_app->name], true);
+		if (!empty($modSettings['_config' . $this->_app->name]))
+			return $this->_config = smf_json_decode($modSettings['_config' . $this->_app->name], true);
 
 		// Get the json file. Must be located in $boarddir folder.
 		if (!$this->_config && !file_exists($file))
@@ -69,7 +68,7 @@ class Config
 		if (!$this->_config)
 			$this->getConfig();
 
-		return $name ? (isset($this->_config['_'. $name]) ? $this->_config['_'. $name] : []) : $this->_config;
+		return $name ? (isset($this->_config['_' . $name]) ? $this->_config['_' . $name] : []) : $this->_config;
 	}
 
 	/**
@@ -95,7 +94,7 @@ class Config
 		$this->_config = array_merge($this->_config, $values);
 
 		// Save it.
-		updateSettings(array('_config'. $this->_app->name => json_encode($this->_config)));
+		updateSettings(['_config' . $this->_app->name => json_encode($this->_config)]);
 
 		// Done!
 		return $this->_config;

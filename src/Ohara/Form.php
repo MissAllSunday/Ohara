@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * @package Ohara helper class
  * @version 1.1
@@ -8,14 +10,18 @@
  * @license http://www.mozilla.org/MPL/2.0/
  */
 
-namespace Suki;
+namespace Ohara;
 
 class Form
 {
 	public $elements = [];
+
 	protected $_buffer = '';
+
 	protected $_app;
-	protected $_options = array('name' => '',);
+
+	protected $_options = ['name' => '',];
+
 	protected $_counter = 0;
 
 	public function __construct(Ohara $app)
@@ -42,7 +48,7 @@ class Form
 		return $this->_app['tools']->text($this->_textPrefix . $text);
 	}
 
-	protected function addElement($element)
+	protected function addElement($element): void
 	{
 		$this->elements[++$this->_counter] = $element;
 	}
@@ -60,7 +66,7 @@ class Form
 		$this->elements[$id] = $data;
 	}
 
-	protected function setParamValues(&$param)
+	protected function setParamValues(&$param): void
 	{
 		// No text? use the name as a $txt key then!
 		if (empty($param['text']))
@@ -68,7 +74,7 @@ class Form
 
 		// Give it a chance to use a full text string.
 		$param['text']  = !empty($param['fullText']) ? $param['fullText'] : $this->setText($param['text']);
-		$param['desc']  = !empty($param['fullDesc']) ? $param['fullDesc'] : $this->setText($param['name'] .'_sub');
+		$param['desc']  = !empty($param['fullDesc']) ? $param['fullDesc'] : $this->setText($param['name'] . '_sub');
 	}
 
 	public function addSelect($param = [])
@@ -80,10 +86,10 @@ class Form
 		$this->setParamValues($param);
 
 		$param['type'] = 'select';
-		$param['html_start'] = '<'. $param['type'] .' name="'. (!empty($this->_options['name']) ? $this->_options['name'] .'['. $param['name'] .']' : $param['name']) .'">';
-		$param['html_end'] = '</'. $param['type'] .'>';
+		$param['html_start'] = '<' . $param['type'] . ' name="' . (!empty($this->_options['name']) ? $this->_options['name'] . '[' . $param['name'] . ']' : $param['name']) . '">';
+		$param['html_end'] = '</' . $param['type'] . '>';
 		foreach($values as $k => $v)
-			$param['values'][$k] = '<option value="' .$k. '" '. (isset($v[1]) && $v[1] == 'selected' ? 'selected="selected"' : '') .'>'. $this->_app['tools']->text($v[0]) .'</option>';
+			$param['values'][$k] = '<option value="' . $k . '" ' . (isset($v[1]) && 'selected' == $v[1] ? 'selected="selected"' : '') . '>' . $this->_app['tools']->text($v[0]) . '</option>';
 
 		return $this->addElement($param);
 	}
@@ -99,7 +105,7 @@ class Form
 		$param['type'] = 'checkbox';
 		$param['value'] = 1;
 		$param['checked'] = empty($param['checked']) ? '' : 'checked="checked"';
-		$param['html'] = '<input type="'. $param['type'] .'" name="'. (!empty($this->_options['name']) ? $this->_options['name'] .'['. $param['name'] .']' : $param['name']) .'" id="'. $param['name'] .'" value="'. $param['value'] .'" '. $param['checked'] .' class="input_check" />';
+		$param['html'] = '<input type="' . $param['type'] . '" name="' . (!empty($this->_options['name']) ? $this->_options['name'] . '[' . $param['name'] . ']' : $param['name']) . '" id="' . $param['name'] . '" value="' . $param['value'] . '" ' . $param['checked'] . ' class="input_check" />';
 
 		return $this->addElement($param);
 	}
@@ -113,9 +119,9 @@ class Form
 		$this->setParamValues($param);
 
 		$param['type'] = 'text';
-		$param['size'] = empty($param['size'] ) ? 'size="20"' : 'size="'. $param['size'] .'"';
-		$param['maxlength'] = empty($param['maxlength']) ? 'maxlength="20"' : 'maxlength="'. $param['maxlength'] .'"';
-		$param['html'] = '<input type="'. $param['type'] .'" name="'. (!empty($this->_options['name']) ? $this->_options['name'] .'['. $param['name'] .']' : $param['name']) .'" id="'. $param['name'] .'" value="'. $param['value'] .'" '. $param['size'] .' '. $param['maxlength'] .' class="input_text" />';
+		$param['size'] = empty($param['size'] ) ? 'size="20"' : 'size="' . $param['size'] . '"';
+		$param['maxlength'] = empty($param['maxlength']) ? 'maxlength="20"' : 'maxlength="' . $param['maxlength'] . '"';
+		$param['html'] = '<input type="' . $param['type'] . '" name="' . (!empty($this->_options['name']) ? $this->_options['name'] . '[' . $param['name'] . ']' : $param['name']) . '" id="' . $param['name'] . '" value="' . $param['value'] . '" ' . $param['size'] . ' ' . $param['maxlength'] . ' class="input_text" />';
 
 		return $this->addElement($param);
 	}
@@ -132,10 +138,10 @@ class Form
 		$param['value'] = empty($param['value']) ? '' : $param['value'];
 
 		// To a void having a large and complicate ternary, split these options.
-		$rows = 'rows="'. (!empty($param['size'] ) && !empty($param['size']['rows']) ? $param['size']['rows'] : 10) .'"';
-		$cols = 'cols="'. (!empty($param['size'] ) && !empty($param['size']['cols']) ? $param['size']['cols'] : 40) .'"';
-		$param['maxlength'] = 'maxlength="'. (!empty($param['size'] ) && !empty($param['size']['maxlength']) ? $param['size']['maxlength'] : 1024) .'"';
-		$param['html'] = '<'. $param['type'] .' name="'. (!empty($this->_options['name']) ? $this->_options['name'] .'['. $param['name'] .']' : $param['name']) .'" id="'. $param['name'] .'" '. $rows .' '. $cols .' '. $param['maxlength'] .'>'. $param['value'] .'</'. $param['type'] .'>';
+		$rows = 'rows="' . (!empty($param['size'] ) && !empty($param['size']['rows']) ? $param['size']['rows'] : 10) . '"';
+		$cols = 'cols="' . (!empty($param['size'] ) && !empty($param['size']['cols']) ? $param['size']['cols'] : 40) . '"';
+		$param['maxlength'] = 'maxlength="' . (!empty($param['size'] ) && !empty($param['size']['maxlength']) ? $param['size']['maxlength'] : 1024) . '"';
+		$param['html'] = '<' . $param['type'] . ' name="' . (!empty($this->_options['name']) ? $this->_options['name'] . '[' . $param['name'] . ']' : $param['name']) . '" id="' . $param['name'] . '" ' . $rows . ' ' . $cols . ' ' . $param['maxlength'] . '>' . $param['value'] . '</' . $param['type'] . '>';
 
 		return $this->addElement($param);
 	}
@@ -143,7 +149,7 @@ class Form
 	public function addHiddenField($name, $value)
 	{
 		$param['type'] = 'hidden';
-		$param['html'] = '<input type="'. $param['type'] .'" name="'. $name .'" id="'. $name .'" value="'. $value .'" />';
+		$param['html'] = '<input type="' . $param['type'] . '" name="' . $name . '" id="' . $name . '" value="' . $value . '" />';
 
 		return $this->addElement($param);
 	}
@@ -209,26 +215,26 @@ class Form
 				case 'text':
 					$this->_buffer .= '
 		<dt>
-			<span>'. $el['text'] .'</span>
-			<br><span class="smalltext">'. $el['desc'] .'</span>
+			<span>' . $el['text'] . '</span>
+			<br><span class="smalltext">' . $el['desc'] . '</span>
 		</dt>
 		<dd>
-			<input type="hidden" name="'. (!empty($this->_formOptions['name']) ? $this->_formOptions['name'] .'['. $el['name'] .']' : $el['name']) .'" value="0" />'. $el['html'] .'
+			<input type="hidden" name="' . (!empty($this->_formOptions['name']) ? $this->_formOptions['name'] . '[' . $el['name'] . ']' : $el['name']) . '" value="0" />' . $el['html'] . '
 		</dd>';
 					break;
 				case 'select':
 					$this->_buffer .= '
 		<dt>
-			<span>'. $el['text'] .'</span>
-			<br><span class="smalltext">'. $el['desc'] .'</span>
+			<span>' . $el['text'] . '</span>
+			<br><span class="smalltext">' . $el['desc'] . '</span>
 		</dt>
 		<dd>
-			<input type="hidden" name="'. (!empty($this->_formOptions['name']) ? $this->_formOptions['name'] .'['. $el['name'] .']' : $el['name']) .'" value="0" />'. $el['html_start'] .'';
+			<input type="hidden" name="' . (!empty($this->_formOptions['name']) ? $this->_formOptions['name'] . '[' . $el['name'] . ']' : $el['name']) . '" value="0" />' . $el['html_start'] . '';
 
 					foreach($el['values'] as $k => $v)
 						$this->_buffer .= $v;
 
-					$this->_buffer .= $el['html_end'] .'
+					$this->_buffer .= $el['html_end'] . '
 				</dd>';
 					break;
 				case 'hidden':
@@ -236,30 +242,30 @@ class Form
 					$this->_buffer .= '
 				<dt></dt>
 				<dd>
-					'. $el['html'] .'
+					' . $el['html'] . '
 				</dd>';
 					break;
 				case 'hr':
 					$this->_buffer .= '
 				</dl>
-					'. $el['html'] .'
+					' . $el['html'] . '
 				<dl class="settings">';
 					break;
 				case 'html':
 					$this->_buffer .= '
 				<dt>
-					<span>'. $el['text'] .'</span>
-					<br><span class="smalltext">'. $el['desc'] .'</span>
+					<span>' . $el['text'] . '</span>
+					<br><span class="smalltext">' . $el['desc'] . '</span>
 				</dt>
 				<dd>
-					'. $el['html'] .'
+					' . $el['html'] . '
 				</dd>';
 					break;
 				case 'section':
 				$this->_buffer .= '
 				</dl>
 				<div class="cat_bar">
-					<h3 class="catbg">'. $el['text'] .'</h3>
+					<h3 class="catbg">' . $el['text'] . '</h3>
 				</div>
 				<br>
 				<dl class="settings">';

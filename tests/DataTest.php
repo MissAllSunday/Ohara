@@ -1,10 +1,13 @@
 <?php
 
-use Suki\Ohara;
+declare(strict_types=1);
 
-class OharaDummyData extends \Suki\Ohara
+use Ohara\Ohara;
+
+class OharaDummyData extends \Ohara\Ohara
 {
 	public $name = 'OharaDummyData';
+
 	public $useConfig = false;
 
 	public function __construct()
@@ -13,15 +16,15 @@ class OharaDummyData extends \Suki\Ohara
 	}
 }
 
-class DataTest extends \PHPUnit_Framework_TestCase
+class DataTest extends \PHPUnit\Framework\TestCase
 {
-	protected function setUp()
+	protected function setUp(): void
 	{
 		$t = new OharaDummyData;
 		$this->_ohara = $t['data'];
 	}
 
-	public function testSetData()
+	public function testSetData(): void
 	{
 		$lol = $_REQUEST['lol'] = 'lol';
 
